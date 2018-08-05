@@ -2,11 +2,11 @@
 
 #include "image.h"
 #include "fmt_farbfeld.h"
-#include "color_rgba.h"
+#include "color.h"
 #include "util.h"
 
 /* this variable is used to register new color formats */
-static int _color_id_counter = 0;
+static int _color_id_counter = 1;
 
 /* this array is used to store new image formats */
 static int _img_format_i = 1;
@@ -17,7 +17,7 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .name = "farbfeld",
         .decode = im_farbfeld_dec,
         .encode = im_farbfeld_enc,
-        .color_model = im_colormodel_rgba,
+        .color_model = im_colormodel_nrgba64,
         .at = im_farbfeld_at,
         .set = im_farbfeld_set
     }

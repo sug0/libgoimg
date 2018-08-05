@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "color_rgba.h"
+#include "color.h"
 #include "fmt_farbfeld.h"
 #include "util.h"
 
@@ -39,7 +39,7 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
     img->w = ntohl(*(uint32_t *)(magic + 8));
     img->h = ntohl(*(uint32_t *)(magic + 12));
 
-    img->size = img->w * img->h * sizeof(uint32_t);
+    img->size = img->w * img->h * sizeof(uint64_t);
     img->img = _xalloc(img->alloc, img->size);
 
     struct _s_bufwriter s = {img->img, img->size};
@@ -68,7 +68,7 @@ int im_farbfeld_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
      * write the pixel data
      * */
 
-    if (likely(fmt->color_model == im_colormodel_rgba))
+    if (likely(fmt->color_model == im_colormodel_nrgba64))
         return (unlikely(wf(dst, (char *)img->img, img->size) < 0)) ? -1 : 0;
 
     /* lossy */
@@ -79,9 +79,9 @@ int im_farbfeld_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
     for (y = 0; y < img->h; y++) {
         for (x = 0; x < img->w; x++) {
             fmt->at(img, x, y, &c_src);
-            im_colormodel_rgba(&c_dst, &c_src);
+            im_colormodel_nrgba64(&c_dst, &c_src);
 
-            if (unlikely(wf(dst, (char *)c_dst.color, sizeof(uint32_t)) < 0)) {
+            if (unlikely(wf(dst, (char *)c_dst.color, sizeof(uint64_t)) < 0)) {
                 err = -1;
                 goto done;
             }
@@ -99,31 +99,31 @@ done:
 
 void im_farbfeld_at(Image_t *img, int x, int y, Color_t *dst)
 {
-    if (!dst->color || (dst->color && dst->size != sizeof(uint32_t))) {
+    if (!dst->color || (dst->color && dst->size != sizeof(uint64_t))) {
         if (dst->color)
             dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
-        dst->size = sizeof(uint32_t);
+        dst->color = _xalloc(dst->alloc, sizeof(uint64_t));
+        dst->size = sizeof(uint64_t);
     }
 
-    if (unlikely(dst->c_id != GOIMG_COLOR_RGBA))
-        dst->c_id = GOIMG_COLOR_RGBA;
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64))
+        dst->c_id = GOIMG_COLOR_NRGBA64;
 
-    *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
+    *(uint64_t *)dst->color = ((uint64_t *)img->img)[y * img->w + x];
 }
 
 void im_farbfeld_set(Image_t *img, int x, int y, Color_t *src)
 {
-    uint32_t color;
+    uint64_t color;
 
-    if (unlikely(src->c_id != GOIMG_COLOR_RGBA)) {
+    if (unlikely(src->c_id != GOIMG_COLOR_NRGBA64)) {
         RGBA128_t c;
         src->rgba128(&c, src->color);
-        color = GOIMG_DECL_RGBA(GOIMG_CC(c.r), GOIMG_CC(c.g),
-                                GOIMG_CC(c.b), GOIMG_CC(c.a));
+        color = im_decl_nrgba64(GOIMG_CC16(c.r), GOIMG_CC16(c.g),
+                                GOIMG_CC16(c.b), GOIMG_CC16(c.a));
     } else {
-        color = *(uint32_t *)src->color;
+        color = *(uint64_t *)src->color;
     }
 
-    ((uint32_t *)img->img)[y * img->w + x] = color;
+    ((uint64_t *)img->img)[y * img->w + x] = color;
 }
