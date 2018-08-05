@@ -17,7 +17,6 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .name = "farbfeld",
         .decode = im_farbfeld_dec,
         .encode = im_farbfeld_enc,
-        .color_model = im_colormodel_nrgba64,
         .at = im_farbfeld_at,
         .set = im_farbfeld_set
     }

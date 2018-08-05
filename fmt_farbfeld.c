@@ -41,10 +41,11 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
 
     img->size = img->w * img->h * sizeof(uint64_t);
     img->img = _xalloc(img->alloc, img->size);
+    img->color_model = im_colormodel_nrgba64;
 
     struct _s_bufwriter s = {img->img, img->size};
 
-    return (rwcpy(_s_bufwrite, &s, rf, src) < 0) ? -1 : 0;
+    return (unlikely(rwcpy(_s_bufwrite, &s, rf, src) < 0)) ? -1 : 0;
 }
 
 int im_farbfeld_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
@@ -68,7 +69,7 @@ int im_farbfeld_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
      * write the pixel data
      * */
 
-    if (likely(fmt->color_model == im_colormodel_nrgba64))
+    if (likely(img->color_model == im_colormodel_nrgba64))
         return (unlikely(wf(dst, (char *)img->img, img->size) < 0)) ? -1 : 0;
 
     /* lossy */
