@@ -27,6 +27,18 @@ void *_xalloc(void *(*malloc)(size_t), size_t size)
     return m;
 }
 
+void *_xcalloc(void *(*calloc)(size_t, size_t), size_t nmemb, size_t size)
+{
+    void *m = calloc(nmemb, size);
+
+    if (!m) {
+        fprintf(stderr, "failed to allocate memory...\n");
+        exit(1);
+    }
+
+    return m;
+}
+
 void *_xrealloc(void *(*realloc)(void *, size_t), void *m, size_t size)
 {
     m = realloc(m, size);

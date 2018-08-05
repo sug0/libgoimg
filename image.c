@@ -28,6 +28,11 @@ inline void im_register_format(ImageFormat_t *fmt)
     _img_formats[_img_format_i++] = *fmt;
 }
 
+inline int im_register_color(void)
+{
+    return ++_color_id_counter;
+}
+
 ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src)
 {
     char buf[8192];

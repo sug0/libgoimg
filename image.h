@@ -80,6 +80,10 @@ struct _s_imgformat {
 /* makes a format available to 'im_decode' and 'im_encode' */
 extern void im_register_format(ImageFormat_t *fmt);
 
+/* returns a new unique 'c_id' to be used by a particular
+ * color format */
+extern int im_register_color(void);
+
 /* decodes an image of a known format; returns NULL on error,
  * or a pointer to the appropriately decoded image
  * format on success */

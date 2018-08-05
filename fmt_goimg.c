@@ -74,7 +74,7 @@ int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
      * */
 
     if (likely(fmt->color_model == im_colormodel_rgba))
-        return (wf(dst, (char *)img->img, img->size) < 0) ? -1 : 0;
+        return (unlikely(wf(dst, (char *)img->img, img->size) < 0)) ? -1 : 0;
 
     /* lossy */
     int x, y, err = 0;

@@ -3,7 +3,7 @@
 
 void im_colormodel_rgba(Color_t *dst, Color_t *src)
 {
-    if (!dst->color || (dst->color && dst->size != sizeof(uint32_t))) {
+    if (unlikely(!dst->color || (dst->color && dst->size != sizeof(uint32_t)))) {
         if (dst->color)
             dst->free(dst->color);
         dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
@@ -44,7 +44,7 @@ inline Color_t im_newcolor_rgba(void)
         .alloc = malloc,
         .free = free,
         .c_id = GOIMG_COLOR_RGBA,
-        .color = _xalloc(malloc, sizeof(uint32_t)),
+        .color = _xcalloc(calloc, 1, sizeof(uint32_t)),
         .size = sizeof(uint32_t),
         .rgba128 = im_rgba_convert_rgba128
     };
