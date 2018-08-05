@@ -14,7 +14,7 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
     [0] = {
         .magic = "\x06\x00\x10\x00",
         .magic_size = 4,
-        .name = "GOIMG",
+        .name = "GoIMG",
         .decode = im_goimg_dec,
         .encode = im_goimg_enc,
         .color_model = im_colormodel_rgba,
@@ -79,4 +79,15 @@ int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst)
             return _img_formats[i].encode(img, &_img_formats[i], wf, dst);
 
     return -1;
+}
+
+ImageFormat_t *im_get_format(char *fmt)
+{
+    int i;
+
+    for (i = 0; i < _img_format_i; i++)
+        if (strcmp(_img_formats[i].name, fmt) == 0)
+            return &_img_formats[i];
+
+    return NULL;
 }

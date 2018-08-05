@@ -110,11 +110,25 @@ void im_goimg_at(Image_t *img, int x, int y, Color_t *dst)
         dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
+
     if (unlikely(dst->c_id != GOIMG_COLOR_RGBA))
         dst->c_id = GOIMG_COLOR_RGBA;
+
     *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
 }
 
 void im_goimg_set(Image_t *img, int x, int y, Color_t *src)
 {
+    uint32_t color;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_RGBA)) {
+        RGBA128_t c;
+        src->rgba128(&c, src->color);
+        color = GOIMG_DECL_RGBA(GOIMG_CC(c.r), GOIMG_CC(c.g),
+                                GOIMG_CC(c.b), GOIMG_CC(c.a));
+    } else {
+        color = *(uint32_t *)src->color;
+    }
+
+    ((uint32_t *)img->img)[y * img->w + x] = color;
 }

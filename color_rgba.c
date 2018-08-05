@@ -3,7 +3,6 @@
 
 void im_colormodel_rgba(Color_t *dst, Color_t *src)
 {
-#define GOIMG_CC(C)  (((C) >> 8) & 0xff)
     if (!dst->color || (dst->color && dst->size != sizeof(uint32_t))) {
         if (dst->color)
             dst->free(dst->color);
@@ -24,7 +23,6 @@ void im_colormodel_rgba(Color_t *dst, Color_t *src)
 
     *(uint32_t *)dst->color = GOIMG_DECL_RGBA(GOIMG_CC(c.r), GOIMG_CC(c.g),
                                               GOIMG_CC(c.b), GOIMG_CC(c.a));
-#undef GOIMG_CC
 }
 
 void im_rgba_convert_rgba128(RGBA128_t *rgba, void *color)

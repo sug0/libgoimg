@@ -3,7 +3,12 @@
 
 #include "image.h"
 
+/* encodes an RGBA color as a uint32_t */
 #define GOIMG_DECL_RGBA(R, G, B, A)  (((R) << 24)|((G) << 16)|((B) << 8)|(A))
+
+/* converts from a 32-bit to an 8-bit RGB(A)
+ * color component */
+#define GOIMG_CC(C)  (((C) >> 8) & 0xff)
 
 /* uses a uint32_t to save a color, i.e.
  * uint32_t color = (r << 24)|(g << 16)|(b << 8)|a; */

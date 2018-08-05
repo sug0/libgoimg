@@ -89,4 +89,8 @@ extern ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src);
  * integer on error, and 0 on success */
 extern int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst);
 
+/* returns a pointer to an image format 'fmt',
+ * or NULL, if no such format is registered */
+extern ImageFormat_t *im_get_format(char *fmt);
+
 #endif
