@@ -36,11 +36,11 @@ int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
     /* read dims */
     uint32_t dim;
 
-    if (rf(src, (char *)&img->w, sizeof(uint32_t)) < 0)
+    if (rf(src, (char *)&dim, sizeof(uint32_t)) < 0)
         return -1;
     img->w = dim;
 
-    if (rf(src, (char *)&img->h, sizeof(uint32_t)) < 0)
+    if (rf(src, (char *)&dim, sizeof(uint32_t)) < 0)
         return -1;
     img->h = dim;
 
