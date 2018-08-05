@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "color_rgba.h"
-#include "fmt_goimg.h"
+#include "fmt_farbfeld.h"
 #include "util.h"
 
 struct _s_bufwriter {
@@ -27,22 +27,17 @@ static int _s_bufwrite(void *dst, char *buf, int size)
     return size;
 }
 
-int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
+int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
 {
+    char magic[16];
+
     /* read the magic */
-    if (rf(src, (char *)&img->size, 4) < 0)
+    if (unlikely(rf(src, magic, 16) < 0))
         return -1;
 
     /* read dims */
-    uint32_t dim;
-
-    if (unlikely(rf(src, (char *)&dim, sizeof(uint32_t)) < 0))
-        return -1;
-    img->w = dim;
-
-    if (unlikely(rf(src, (char *)&dim, sizeof(uint32_t)) < 0))
-        return -1;
-    img->h = dim;
+    img->w = ntohl(*(uint32_t *)(magic + 8));
+    img->h = ntohl(*(uint32_t *)(magic + 12));
 
     img->size = img->w * img->h * sizeof(uint32_t);
     img->img = _xalloc(img->alloc, img->size);
@@ -52,20 +47,20 @@ int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
     return (rwcpy(_s_bufwrite, &s, rf, src) < 0) ? -1 : 0;
 }
 
-int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
+int im_farbfeld_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
 {
     /* write the magic */
-    if (unlikely(wf(dst, "\x06\x00\x10\x00", 4) < 0))
+    if (unlikely(wf(dst, "farbfeld", 8) < 0))
         return -1;
 
     /* write dimensions */
     uint32_t dim;
 
-    dim = img->w;
+    dim = htonl((uint32_t)img->w);
     if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
 
-    dim = img->h;
+    dim = htonl((uint32_t)img->h);
     if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
 
@@ -102,7 +97,7 @@ done:
     return err;
 }
 
-void im_goimg_at(Image_t *img, int x, int y, Color_t *dst)
+void im_farbfeld_at(Image_t *img, int x, int y, Color_t *dst)
 {
     if (!dst->color || (dst->color && dst->size != sizeof(uint32_t))) {
         if (dst->color)
@@ -117,7 +112,7 @@ void im_goimg_at(Image_t *img, int x, int y, Color_t *dst)
     *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
 }
 
-void im_goimg_set(Image_t *img, int x, int y, Color_t *src)
+void im_farbfeld_set(Image_t *img, int x, int y, Color_t *src)
 {
     uint32_t color;
 

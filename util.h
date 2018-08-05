@@ -3,6 +3,14 @@
 
 #include <stdbool.h>
 
+#if defined(_WIN32) || defined(_WIN64)
+    #include <winsock.h>
+#elif defined(__CYGWIN__) && !defined(_WIN32)
+    #include <arpa/inet.h>
+#else
+    #include <arpa/inet.h>
+#endif
+
 #ifdef __GNUC__
     #define unlikely(X)  __builtin_expect(!!(X), 0)
     #define likely(X)    __builtin_expect(!!(X), 1)

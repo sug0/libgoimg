@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include "image.h"
-#include "fmt_goimg.h"
+#include "fmt_farbfeld.h"
 #include "color_rgba.h"
 #include "util.h"
 
@@ -12,14 +12,14 @@ static int _color_id_counter = 0;
 static int _img_format_i = 1;
 static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
     [0] = {
-        .magic = "\x06\x00\x10\x00",
-        .magic_size = 4,
-        .name = "GoIMG",
-        .decode = im_goimg_dec,
-        .encode = im_goimg_enc,
+        .magic = "farbfeld????????",
+        .magic_size = 16,
+        .name = "farbfeld",
+        .decode = im_farbfeld_dec,
+        .encode = im_farbfeld_enc,
         .color_model = im_colormodel_rgba,
-        .at = im_goimg_at,
-        .set = im_goimg_set
+        .at = im_farbfeld_at,
+        .set = im_farbfeld_set
     }
 };
 
