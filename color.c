@@ -169,7 +169,7 @@ inline Color_t im_newcolor_gray(void)
     return (Color_t){
         .alloc = malloc,
         .free = free,
-        .c_id = im_register_color(),
+        .c_id = GOIMG_COLOR_GRAY,
         .color = _xcalloc(calloc, 1, sizeof(uint8_t)),
         .size = sizeof(uint8_t),
         .rgba128 = im_gray_convert_rgba128
