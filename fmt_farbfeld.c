@@ -100,7 +100,7 @@ done:
 
 void im_farbfeld_at(Image_t *img, int x, int y, Color_t *dst)
 {
-    if (!dst->color || (dst->color && dst->size != sizeof(uint64_t))) {
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint64_t)))) {
         if (dst->color)
             dst->free(dst->color);
         dst->color = _xalloc(dst->alloc, sizeof(uint64_t));

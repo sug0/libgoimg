@@ -11,12 +11,17 @@
  * color component */
 #define GOIMG_CC16(C)  ((C) & 0xffff)
 
+enum _goimg_colors {
 /* represents a non alpha premultiplied RGBA color */
-#define GOIMG_COLOR_NRGBA  0
-
+    GOIMG_COLOR_NRGBA,
 /* represents a non alpha premultiplied RGBA color,
  * with each component holding 16-bits */
-#define GOIMG_COLOR_NRGBA64  1
+    GOIMG_COLOR_NRGBA64,
+/* represents an 8-bit grayscale color */
+    GOIMG_COLOR_GRAY,
+
+    GOIMG_NO_DEF_COLORS
+};
 
 /* NRGBA color */
 extern uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
@@ -29,6 +34,11 @@ extern uint64_t im_decl_nrgba64(uint64_t r, uint64_t g, uint64_t b, uint64_t a);
 extern void im_colormodel_nrgba64(Color_t *dst, Color_t *src);
 extern void im_nrgba64_convert_rgba128(RGBA128_t *rgba, void *color);
 extern Color_t im_newcolor_nrgba64(void);
+
+/* gray color */
+extern void im_colormodel_gray(Color_t *dst, Color_t *src);
+extern void im_gray_convert_rgba128(RGBA128_t *rgba, void *color);
+extern Color_t im_newcolor_gray(void);
 
 #endif
 

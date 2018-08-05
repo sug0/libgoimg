@@ -6,7 +6,7 @@
 #include "util.h"
 
 /* this variable is used to register new color formats */
-static int _color_id_counter = 1;
+static int _color_id_counter = GOIMG_NO_DEF_COLORS - 1;
 
 /* this array is used to store new image formats */
 static int _img_format_i = 1;
