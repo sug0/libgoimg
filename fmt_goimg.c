@@ -110,7 +110,7 @@ void im_goimg_at(Image_t *img, int x, int y, Color_t *dst)
         dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
-    if (dst->c_id != GOIMG_COLOR_RGBA)
+    if (unlikely(dst->c_id != GOIMG_COLOR_RGBA))
         dst->c_id = GOIMG_COLOR_RGBA;
     *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
 }
