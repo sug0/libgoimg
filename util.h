@@ -5,14 +5,10 @@
 
 #ifdef __GNUC__
     #define unlikely(X)  __builtin_expect((X), 0)
+    #define likely(X)    __builtin_expect((X), 1)
 #else
     #define unlikely(X)  (X)
-#endif
-
-#ifdef __GNUC__
-    #define likely(X)  __builtin_expect((X), 1)
-#else
-    #define likely(X)  (X)
+    #define likely(X)    (X)
 #endif
 
 extern bool _m_match(char *magic, int msize, char *b, int bsize);
