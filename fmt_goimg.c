@@ -82,7 +82,7 @@ int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
             c_dst = {.color = NULL, .alloc = malloc, .free = free};
 
     for (y = 0; y < img->h; y++) {
-        for (x = 0; x < img->w; x += 4) {
+        for (x = 0; x < img->w; x++) {
             fmt->at(img, x, y, &c_src);
             im_colormodel_rgba(&c_dst, &c_src);
 
