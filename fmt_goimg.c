@@ -14,10 +14,10 @@ static int _s_bufwrite(void *dst, char *buf, int size)
 {
     struct _s_bufwriter *s = (struct _s_bufwriter *)dst;
 
-    if (!s->avail)
+    if (unlikely(!s->avail))
         return 0;
 
-    if (size > s->avail)
+    if (unlikely(size > s->avail))
         size = s->avail;
 
     memcpy(s->buf, buf, size);
@@ -36,11 +36,11 @@ int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
     /* read dims */
     uint32_t dim;
 
-    if (rf(src, (char *)&dim, sizeof(uint32_t)) < 0)
+    if (unlikely(rf(src, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
     img->w = dim;
 
-    if (rf(src, (char *)&dim, sizeof(uint32_t)) < 0)
+    if (unlikely(rf(src, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
     img->h = dim;
 
@@ -55,25 +55,25 @@ int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
 int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
 {
     /* write the magic */
-    if (wf(dst, "\x06\x00\x10\x00", 4) < 0)
+    if (unlikely(wf(dst, "\x06\x00\x10\x00", 4) < 0))
         return -1;
 
     /* write dimensions */
     uint32_t dim;
 
     dim = img->w;
-    if (wf(dst, (char *)&dim, sizeof(uint32_t)) < 0)
+    if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
 
     dim = img->h;
-    if (wf(dst, (char *)&dim, sizeof(uint32_t)) < 0)
+    if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
         return -1;
 
     /*
      * write the pixel data
      * */
 
-    if (fmt->color_model == im_colormodel_rgba)
+    if (likely(fmt->color_model == im_colormodel_rgba))
         return (wf(dst, (char *)img->img, img->size) < 0) ? -1 : 0;
 
     /* lossy */
@@ -86,7 +86,7 @@ int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
             fmt->at(img, x, y, &c_src);
             im_colormodel_rgba(&c_dst, &c_src);
 
-            if (wf(dst, (char *)c_dst.color, sizeof(uint32_t)) < 0) {
+            if (unlikely(wf(dst, (char *)c_dst.color, sizeof(uint32_t)) < 0)) {
                 err = -1;
                 goto done;
             }
@@ -94,9 +94,9 @@ int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
     }
 
 done:
-    if (c_src.color)
+    if (likely(c_src.color))
         free(c_src.color);
-    if (c_dst.color)
+    if (likely(c_dst.color))
         free(c_dst.color);
 
     return err;

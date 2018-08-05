@@ -12,7 +12,7 @@ void im_colormodel_rgba(Color_t *dst, Color_t *src)
     if (unlikely(dst->c_id != GOIMG_COLOR_RGBA))
         dst->c_id = GOIMG_COLOR_RGBA;
 
-    if (src->c_id == GOIMG_COLOR_RGBA) {
+    if (likely(src->c_id == GOIMG_COLOR_RGBA)) {
         *(uint32_t *)dst->color = *(uint32_t *)src->color;
         return;
     }
