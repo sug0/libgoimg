@@ -4,8 +4,8 @@
 #include <stdbool.h>
 
 #ifdef __GNUC__
-    #define unlikely(X)  __builtin_expect((X), 0)
-    #define likely(X)    __builtin_expect((X), 1)
+    #define unlikely(X)  __builtin_expect(!!(X), 0)
+    #define likely(X)    __builtin_expect(!!(X), 1)
 #else
     #define unlikely(X)  (X)
     #define likely(X)    (X)
