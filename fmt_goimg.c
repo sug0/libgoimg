@@ -44,7 +44,7 @@ int im_goimg_dec(Image_t *img, rfun_t rf, void *src)
         return -1;
     img->h = dim;
 
-    img->size = img->w * img->h * 4;
+    img->size = img->w * img->h * sizeof(uint32_t);
     img->img = _xalloc(img->alloc, img->size);
 
     struct _s_bufwriter s = {img->img, img->size};
@@ -86,7 +86,7 @@ int im_goimg_enc(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst)
             fmt->at(img, x, y, &c_src);
             im_colormodel_rgba(&c_dst, &c_src);
 
-            if (wf(dst, (char *)c_dst.color, 4) < 0) {
+            if (wf(dst, (char *)c_dst.color, sizeof(uint32_t)) < 0) {
                 err = -1;
                 goto done;
             }
