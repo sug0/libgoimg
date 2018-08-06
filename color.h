@@ -28,6 +28,9 @@ extern uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 extern void im_colormodel_nrgba(Color_t *dst, Color_t *src);
 extern void im_nrgba_convert_rgba128(RGBA128_t *rgba, void *color);
 extern Color_t im_newcolor_nrgba(void);
+extern Image_t im_newimg_nrgba(int w, int h, void *(*alloc)(size_t), void (*free)(void *));
+extern void im_nrgba_at(Image_t *img, int x, int y, Color_t *dst);
+extern void im_nrgba_set(Image_t *img, int x, int y, Color_t *src);
 
 /* NRGBA64 color */
 extern uint64_t im_decl_nrgba64(uint64_t r, uint64_t g, uint64_t b, uint64_t a);
@@ -42,6 +45,9 @@ extern void im_nrgba64_set(Image_t *img, int x, int y, Color_t *src);
 extern void im_colormodel_gray(Color_t *dst, Color_t *src);
 extern void im_gray_convert_rgba128(RGBA128_t *rgba, void *color);
 extern Color_t im_newcolor_gray(void);
+extern Image_t im_newimg_gray(int w, int h, void *(*alloc)(size_t), void (*free)(void *));
+extern void im_gray_at(Image_t *img, int x, int y, Color_t *dst);
+extern void im_gray_set(Image_t *img, int x, int y, Color_t *src);
 
 #endif
 

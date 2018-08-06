@@ -64,6 +64,55 @@ inline Color_t im_newcolor_nrgba(void)
     };
 }
 
+inline Image_t im_newimg_nrgba(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+{
+    size_t size = w * h * sizeof(uint32_t);
+    return (Image_t){
+        .alloc = alloc,
+        .free = free,
+        .img = _xalloc(alloc, size),
+        .size = size,
+        .w = w,
+        .h = h,
+        .color_model = im_colormodel_nrgba,
+        .at = im_nrgba_at,
+        .set = im_nrgba_set
+    };
+}
+
+void im_nrgba_at(Image_t *img, int x, int y, Color_t *dst)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
+        if (dst->color)
+            dst->free(dst->color);
+        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+        dst->size = sizeof(uint32_t);
+    }
+
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA)) {
+        dst->c_id = GOIMG_COLOR_NRGBA;
+        dst->rgba128 = im_nrgba_convert_rgba128;
+    }
+
+    *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
+}
+
+void im_nrgba_set(Image_t *img, int x, int y, Color_t *src)
+{
+    uint32_t color;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_NRGBA)) {
+        RGBA128_t c;
+        src->rgba128(&c, src->color);
+        color = im_decl_nrgba64(GOIMG_CC(c.r), GOIMG_CC(c.g),
+                                GOIMG_CC(c.b), GOIMG_CC(c.a));
+    } else {
+        color = *(uint32_t *)src->color;
+    }
+
+    ((uint32_t *)img->img)[y * img->w + x] = color;
+}
+
 /* -------------------------------------------------------------------------- */
 
 inline uint64_t im_decl_nrgba64(uint64_t r, uint64_t g, uint64_t b, uint64_t a)
@@ -149,8 +198,10 @@ void im_nrgba64_at(Image_t *img, int x, int y, Color_t *dst)
         dst->size = sizeof(uint64_t);
     }
 
-    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64))
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64)) {
         dst->c_id = GOIMG_COLOR_NRGBA64;
+        dst->rgba128 = im_nrgba64_convert_rgba128;
+    }
 
     *(uint64_t *)dst->color = ((uint64_t *)img->img)[y * img->w + x];
 }
@@ -185,7 +236,7 @@ void im_colormodel_gray(Color_t *dst, Color_t *src)
         dst->c_id = GOIMG_COLOR_NRGBA64;
 
     if (likely(src->c_id == GOIMG_COLOR_GRAY)) {
-        *(uint64_t *)dst->color = *(uint64_t *)src->color;
+        *(uint8_t *)dst->color = *(uint8_t *)src->color;
         return;
     }
 
@@ -195,7 +246,7 @@ void im_colormodel_gray(Color_t *dst, Color_t *src)
 
     uint8_t y = (19595*c.r + 38470*c.g + 7471*c.b + 0x8000) >> 2;
 
-    *(uint64_t *)dst->color = y;
+    *(uint8_t *)dst->color = y;
 }
 
 void im_gray_convert_rgba128(RGBA128_t *rgba, void *color)
@@ -221,4 +272,52 @@ inline Color_t im_newcolor_gray(void)
         .size = sizeof(uint8_t),
         .rgba128 = im_gray_convert_rgba128
     };
+}
+
+inline Image_t im_newimg_gray(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+{
+    size_t size = w * h * sizeof(uint8_t);
+    return (Image_t){
+        .alloc = alloc,
+        .free = free,
+        .img = _xalloc(alloc, size),
+        .size = size,
+        .w = w,
+        .h = h,
+        .color_model = im_colormodel_gray,
+        .at = im_gray_at,
+        .set = im_gray_set
+    };
+}
+
+void im_gray_at(Image_t *img, int x, int y, Color_t *dst)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint8_t)))) {
+        if (dst->color)
+            dst->free(dst->color);
+        dst->color = _xalloc(dst->alloc, sizeof(uint8_t));
+        dst->size = sizeof(uint8_t);
+    }
+
+    if (unlikely(dst->c_id != GOIMG_COLOR_GRAY)) {
+        dst->c_id = GOIMG_COLOR_GRAY;
+        dst->rgba128 = im_gray_convert_rgba128;
+    }
+
+    *(uint8_t *)dst->color = ((uint8_t *)img->img)[y * img->w + x];
+}
+
+void im_gray_set(Image_t *img, int x, int y, Color_t *src)
+{
+    uint8_t color;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_GRAY)) {
+        RGBA128_t c;
+        src->rgba128(&c, src->color);
+        color = (19595*c.r + 38470*c.g + 7471*c.b + 0x8000) >> 2;
+    } else {
+        color = *(uint8_t *)src->color;
+    }
+
+    ((uint8_t *)img->img)[y * img->w + x] = color;
 }

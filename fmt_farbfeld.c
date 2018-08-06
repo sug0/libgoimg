@@ -92,10 +92,8 @@ int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
     }
 
 done:
-    if (likely(c_src.color))
-        free(c_src.color);
-    if (likely(c_dst.color))
-        free(c_dst.color);
+    free(c_src.color);
+    free(c_dst.color);
 
     return err;
 }
