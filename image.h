@@ -24,7 +24,7 @@ typedef void (*cmfun_t)(Color_t *dst, Color_t *src);
 typedef int (*decfun_t)(Image_t *img, rfun_t rf, void *src);
 
 /* encodes an image to a GOIO writer */
-typedef int (*encfun_t)(Image_t *img, ImageFormat_t *fmt, wfun_t wf, void *dst);
+typedef int (*encfun_t)(Image_t *img, wfun_t wf, void *dst);
 
 /* saves in 'dst' the color in the image 'img' at the
  * coordinates ('x', 'y') */
@@ -45,7 +45,10 @@ struct _s_im_image {
     void *img;
     size_t size;
     int w, h;
+
     cmfun_t color_model;
+    im_atfun_t at;
+    im_setfun_t set;
 };
 
 /* represents a rgba color with 32-bit
@@ -73,8 +76,6 @@ struct _s_imgformat {
     char *name;
     decfun_t decode;
     encfun_t encode;
-    im_atfun_t at;
-    im_setfun_t set;
 };
 
 /* makes a format available to 'im_decode' and 'im_encode' */

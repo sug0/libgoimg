@@ -124,6 +124,53 @@ inline Color_t im_newcolor_nrgba64(void)
     };
 }
 
+inline Image_t im_newimg_nrgba64(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+{
+    size_t size = w * h * sizeof(uint64_t);
+    return (Image_t){
+        .alloc = alloc,
+        .free = free,
+        .img = _xalloc(alloc, size),
+        .size = size,
+        .w = w,
+        .h = h,
+        .color_model = im_colormodel_nrgba64,
+        .at = im_nrgba64_at,
+        .set = im_nrgba64_set
+    };
+}
+
+void im_nrgba64_at(Image_t *img, int x, int y, Color_t *dst)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint64_t)))) {
+        if (dst->color)
+            dst->free(dst->color);
+        dst->color = _xalloc(dst->alloc, sizeof(uint64_t));
+        dst->size = sizeof(uint64_t);
+    }
+
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64))
+        dst->c_id = GOIMG_COLOR_NRGBA64;
+
+    *(uint64_t *)dst->color = ((uint64_t *)img->img)[y * img->w + x];
+}
+
+void im_nrgba64_set(Image_t *img, int x, int y, Color_t *src)
+{
+    uint64_t color;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_NRGBA64)) {
+        RGBA128_t c;
+        src->rgba128(&c, src->color);
+        color = im_decl_nrgba64(GOIMG_CC16(c.r), GOIMG_CC16(c.g),
+                                GOIMG_CC16(c.b), GOIMG_CC16(c.a));
+    } else {
+        color = *(uint64_t *)src->color;
+    }
+
+    ((uint64_t *)img->img)[y * img->w + x] = color;
+}
+
 /* -------------------------------------------------------------------------- */
 
 void im_colormodel_gray(Color_t *dst, Color_t *src)

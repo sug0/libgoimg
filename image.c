@@ -17,8 +17,6 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .name = "farbfeld",
         .decode = im_farbfeld_dec,
         .encode = im_farbfeld_enc,
-        .at = im_farbfeld_at,
-        .set = im_farbfeld_set
     }
 };
 
@@ -91,7 +89,7 @@ int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst)
 
     for (i = 0; i < _img_format_i; i++)
         if (strcmp(_img_formats[i].name, fmt) == 0)
-            return _img_formats[i].encode(img, &_img_formats[i], wf, dst);
+            return _img_formats[i].encode(img, wf, dst);
 
     return -1;
 }
