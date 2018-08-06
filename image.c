@@ -27,6 +27,17 @@ inline void im_register_format(ImageFormat_t *fmt)
     _img_formats[_img_format_i++] = *fmt;
 }
 
+ImageFormat_t *im_get_format(char *fmt)
+{
+    int i;
+
+    for (i = 0; i < _img_format_i; i++)
+        if (strcmp(_img_formats[i].name, fmt) == 0)
+            return &_img_formats[i];
+
+    return NULL;
+}
+
 inline int im_register_color(void)
 {
     return ++_color_id_counter;
@@ -83,15 +94,4 @@ int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst)
             return _img_formats[i].encode(img, &_img_formats[i], wf, dst);
 
     return -1;
-}
-
-ImageFormat_t *im_get_format(char *fmt)
-{
-    int i;
-
-    for (i = 0; i < _img_format_i; i++)
-        if (strcmp(_img_formats[i].name, fmt) == 0)
-            return &_img_formats[i];
-
-    return NULL;
 }
