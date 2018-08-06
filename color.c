@@ -104,8 +104,8 @@ void im_nrgba_set(Image_t *img, int x, int y, Color_t *src)
     if (unlikely(src->c_id != GOIMG_COLOR_NRGBA)) {
         RGBA128_t c;
         src->rgba128(&c, src->color);
-        color = im_decl_nrgba64(GOIMG_CC(c.r), GOIMG_CC(c.g),
-                                GOIMG_CC(c.b), GOIMG_CC(c.a));
+        color = im_decl_nrgba(GOIMG_CC(c.r), GOIMG_CC(c.g),
+                              GOIMG_CC(c.b), GOIMG_CC(c.a));
     } else {
         color = *(uint32_t *)src->color;
     }
