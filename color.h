@@ -11,6 +11,13 @@
  * color component */
 #define GOIMG_CC16(C)  ((C) & 0xffff)
 
+/* defines a CMYK color based on percentage values */
+#define im_decl_cmyk_p(C, M, Y, K)       \
+    im_decl_cmyk((uint8_t)((C) * 255.0), \
+                 (uint8_t)((M) * 255.0), \
+                 (uint8_t)((Y) * 255.0), \
+                 (uint8_t)((K) * 255.0)) \
+
 enum _goimg_colors {
 /* represents a non alpha premultiplied RGBA color */
     GOIMG_COLOR_NRGBA,
