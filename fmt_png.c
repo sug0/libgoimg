@@ -34,8 +34,8 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     png_structp png_ptr = NULL;
     png_infop info_ptr = NULL;
 
-    Color_t c_src = {.color = NULL, .alloc = malloc, .free = free},
-            c_dst = {.color = NULL, .alloc = malloc, .free = free};
+    //Color_t c_src = {.color = NULL, .alloc = malloc, .free = free},
+    //        c_dst = {.color = NULL, .alloc = malloc, .free = free};
 
     /* initialize write */
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -54,17 +54,20 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     png_set_write_fn(png_ptr, &s, _png_write_fn, NULL);
 
     /* determine color type and bit depth */
-    int color_type, bit_depth;
+    int color_type, bit_depth, pix_width;
 
     if (img->color_model == im_colormodel_nrgba) {
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         bit_depth = 8;
+        pix_width = 4;
     } else if (img->color_model == im_colormodel_nrgba64) {
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         bit_depth = 16;
+        pix_width = 4;
     } else if (img->color_model == im_colormodel_gray) {
         color_type = PNG_COLOR_TYPE_GRAY;
         bit_depth = 8;
+        pix_width = 1;
     } else {
         /* TODO: lossy conversion */
         _im_maybe_jmp_err(0);
@@ -84,7 +87,7 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     int y;
 
     for (y = 0; y < img->h; y++)
-        png_write_row(png_ptr, img->img + y*img->w);
+        png_write_row(png_ptr, img->img + y*img->w*pix_width);
 
     /* write final chunk */
     png_write_end(png_ptr, NULL);
@@ -108,8 +111,8 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
 //    }
 //
 done:
-    if (likely(c_src.color)) free(c_src.color);
-    if (likely(c_dst.color)) free(c_dst.color);
+    //if (likely(c_src.color)) free(c_src.color);
+    //if (likely(c_dst.color)) free(c_dst.color);
     if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     if (likely(png_ptr)) png_destroy_write_struct(&png_ptr, &info_ptr);
 
