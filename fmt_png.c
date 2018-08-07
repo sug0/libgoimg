@@ -90,6 +90,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
             img->color_model = im_colormodel_gray;
             img->at = im_gray_at;
             img->set = im_gray_set;
+            pix_width = sizeof(uint8_t);
             break;
 
         /* TODO: implement gray16 */
@@ -97,7 +98,6 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         default:
             _im_maybe_jmp_err(0);
         }
-        pix_width = 1;
         break;
     case PNG_COLOR_TYPE_RGB_ALPHA:
         switch (bit_depth) {
@@ -107,6 +107,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
             img->color_model = im_colormodel_nrgba;
             img->at = im_nrgba_at;
             img->set = im_nrgba_at;
+            pix_width = sizeof(uint32_t);
             break;
         case 16:
             img->size = img->w * img->h * sizeof(uint64_t);
@@ -114,11 +115,11 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
             img->color_model = im_colormodel_nrgba64;
             img->at = im_nrgba64_at;
             img->set = im_nrgba64_at;
+            pix_width = sizeof(uint64_t);
             break;
         default:
             _im_maybe_jmp_err(0);
         }
-        pix_width = 4;
         break;
 
     /* TODO: implement missing color spaces */
@@ -183,15 +184,15 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     if (img->color_model == im_colormodel_nrgba) {
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         bit_depth = 8;
-        pix_width = 4;
+        pix_width = sizeof(uint32_t);
     } else if (img->color_model == im_colormodel_nrgba64) {
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         bit_depth = 16;
-        pix_width = 4;
+        pix_width = sizeof(uint64_t);
     } else if (img->color_model == im_colormodel_gray) {
         color_type = PNG_COLOR_TYPE_GRAY;
         bit_depth = 8;
-        pix_width = 1;
+        pix_width = sizeof(uint8_t);
     } else {
         /* TODO: lossy conversion */
         _im_maybe_jmp_err(0);
@@ -202,7 +203,7 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     png_set_IHDR(png_ptr, info_ptr,
                  img->w, img->h,
                  bit_depth, color_type, PNG_INTERLACE_NONE,
-                 PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
     /* write metadata stuff */
     png_write_info(png_ptr, info_ptr);
