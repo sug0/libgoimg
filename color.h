@@ -32,6 +32,11 @@ enum _goimg_colors {
     GOIMG_NO_DEF_COLORS
 };
 
+
+/* guesses the most appropriate color to use
+ * on a decoded image, based on the color model */
+extern Color_t im_newcolor_from_img(Image_t *img);
+
 /* NRGBA color */
 extern uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 extern void im_colormodel_nrgba(Color_t *dst, Color_t *src);

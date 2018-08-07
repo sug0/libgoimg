@@ -1,6 +1,22 @@
 #include "color.h"
 #include "util.h"
 
+inline Color_t im_newcolor_from_img(Image_t *img)
+{
+    if (img->color_model == im_colormodel_nrgba)
+        return im_newcolor_nrgba();
+    else if (img->color_model == im_colormodel_nrgba64)
+        return im_newcolor_nrgba64();
+    else if (img->color_model == im_colormodel_gray)
+        return im_newcolor_gray();
+    else if (img->color_model == im_colormodel_cmyk)
+        return im_newcolor_cmyk();
+    else
+        return im_newcolor_nrgba();
+}
+
+/* -------------------------------------------------------------------------- */
+
 inline uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a)
 {
     return (a << 24)|(b << 16)|(g << 8)|r;
