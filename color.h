@@ -19,6 +19,8 @@ enum _goimg_colors {
     GOIMG_COLOR_NRGBA64,
 /* represents an 8-bit grayscale color */
     GOIMG_COLOR_GRAY,
+/* represents an opaque CMYK color */
+    GOIMG_COLOR_CMYK,
 
     GOIMG_NO_DEF_COLORS
 };
@@ -49,5 +51,10 @@ extern Image_t im_newimg_gray(int w, int h, void *(*alloc)(size_t), void (*free)
 extern void im_gray_at(Image_t *img, int x, int y, Color_t *dst);
 extern void im_gray_set(Image_t *img, int x, int y, Color_t *src);
 
-#endif
+/* CMYK color */
+extern uint32_t im_decl_cmyk(uint32_t c, uint32_t m, uint32_t y, uint32_t k);
+extern void im_colormodel_cmyk(Color_t *dst, Color_t *src);
+extern void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color);
+extern Color_t im_newcolor_cmyk(void);
 
+#endif

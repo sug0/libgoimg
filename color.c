@@ -14,8 +14,10 @@ void im_colormodel_nrgba(Color_t *dst, Color_t *src)
         dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
-    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA))
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA)) {
         dst->c_id = GOIMG_COLOR_NRGBA;
+        dst->rgba128 = im_nrgba_convert_rgba128;
+    }
 
     if (likely(src->c_id == GOIMG_COLOR_NRGBA)) {
         *(uint32_t *)dst->color = *(uint32_t *)src->color;
@@ -128,8 +130,10 @@ void im_colormodel_nrgba64(Color_t *dst, Color_t *src)
         dst->color = _xalloc(dst->alloc, sizeof(uint64_t));
         dst->size = sizeof(uint64_t);
     }
-    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64))
+    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64)) {
         dst->c_id = GOIMG_COLOR_NRGBA64;
+        dst->rgba128 = im_nrgba64_convert_rgba128;
+    }
 
     if (likely(src->c_id == GOIMG_COLOR_NRGBA64)) {
         *(uint64_t *)dst->color = *(uint64_t *)src->color;
@@ -232,8 +236,10 @@ void im_colormodel_gray(Color_t *dst, Color_t *src)
         dst->color = _xalloc(dst->alloc, sizeof(uint8_t));
         dst->size = sizeof(uint8_t);
     }
-    if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64))
-        dst->c_id = GOIMG_COLOR_NRGBA64;
+    if (unlikely(dst->c_id != GOIMG_COLOR_GRAY)) {
+        dst->c_id = GOIMG_COLOR_GRAY;
+        dst->rgba128 = im_gray_convert_rgba128;
+    }
 
     if (likely(src->c_id == GOIMG_COLOR_GRAY)) {
         *(uint8_t *)dst->color = *(uint8_t *)src->color;
@@ -320,4 +326,80 @@ void im_gray_set(Image_t *img, int x, int y, Color_t *src)
     }
 
     ((uint8_t *)img->img)[y * img->w + x] = color;
+}
+
+/* -------------------------------------------------------------------------- */
+
+inline uint32_t im_decl_cmyk(uint32_t c, uint32_t m, uint32_t y, uint32_t k)
+{
+    return (k << 24)|(y << 16)|(m << 8)|c;
+}
+
+void im_colormodel_cmyk(Color_t *dst, Color_t *src)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
+        if (dst->color)
+            dst->free(dst->color);
+        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+        dst->size = sizeof(uint32_t);
+    }
+    if (unlikely(dst->c_id != GOIMG_COLOR_CMYK)) {
+        dst->c_id = GOIMG_COLOR_CMYK;
+        dst->rgba128 = im_cmyk_convert_rgba128;
+    }
+
+    if (likely(src->c_id == GOIMG_COLOR_CMYK)) {
+        *(uint32_t *)dst->color = *(uint32_t *)src->color;
+        return;
+    }
+
+    /* lossy conversion */
+    RGBA128_t col;
+    uint32_t c, m, y, w;
+    src->rgba128(&col, src->color);
+
+    w = col.r;
+    if (w < col.g) w = col.g;
+    if (w < col.b) w = col.b;
+
+    if (w == 0) {
+        *(uint32_t *)dst->color = 0xff000000;
+        return;
+    }
+
+    c = (w - col.r) * 0xffff / w;
+    m = (w - col.g) * 0xffff / w;
+    y = (w - col.b) * 0xffff / w;
+
+    *(uint32_t *)dst->color = im_decl_cmyk(GOIMG_CC(c), GOIMG_CC(m),
+                                           GOIMG_CC(y), GOIMG_CC(0xffff - w));
+}
+
+void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color)
+{
+    uint32_t c, m, y, k, w;
+
+    k = (*(uint32_t *)color >> 24);
+    y = (*(uint32_t *)color >> 16) & 0xff;
+    m = (*(uint32_t *)color >> 8) & 0xff;
+    c = (*(uint32_t *)color & 0xff);
+
+    w = 0xffff - k*0x101;
+
+    rgba->r = (0xffff - c*0x101) * w / 0xffff;
+    rgba->g = (0xffff - m*0x101) * w / 0xffff;
+    rgba->b = (0xffff - y*0x101) * w / 0xffff;
+    rgba->a = 0xffff;
+}
+
+inline Color_t im_newcolor_cmyk(void)
+{
+    return (Color_t){
+        .alloc = malloc,
+        .free = free,
+        .c_id = GOIMG_COLOR_CMYK,
+        .color = _xcalloc(calloc, 1, sizeof(uint32_t)),
+        .size = sizeof(uint32_t),
+        .rgba128 = im_cmyk_convert_rgba128
+    };
 }
