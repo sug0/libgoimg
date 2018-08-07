@@ -76,8 +76,8 @@ int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
 
     /* lossy */
     int x, y, err = 0;
-    Color_t c_src = {.color = NULL, .alloc = malloc, .free = free},
-            c_dst = {.color = NULL, .alloc = malloc, .free = free};
+    Color_t c_src = im_newcolor_from_img(img),
+            c_dst = im_newcolor_nrgba64();
 
     for (y = 0; y < img->h; y++) {
         for (x = 0; x < img->w; x++) {

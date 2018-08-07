@@ -1,24 +1,35 @@
 #include <string.h>
 
 #include "image.h"
-#include "fmt_farbfeld.h"
 #include "color.h"
 #include "util.h"
+
+#include "fmt_farbfeld.h"
+#include "fmt_png.h"
 
 /* this variable is used to register new color formats */
 static int _color_id_counter = GOIMG_NO_DEF_COLORS - 1;
 
 /* this array is used to store new image formats */
-static int _img_format_i = 1;
 static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
+    /* farbfeld */
     [0] = {
         .magic = "farbfeld????????",
         .magic_size = 16,
         .name = "farbfeld",
         .decode = im_farbfeld_dec,
         .encode = im_farbfeld_enc,
+    },
+    /* PNG */
+    [1] = {
+        .magic = "\x89PNG\r\n\x1a\n",
+        .magic_size = 8,
+        .name = "PNG",
+        .decode = im_png_dec,
+        .encode = im_png_enc,
     }
 };
+static int _img_format_i = sizeof(_img_formats)/sizeof(_img_formats[0]);
 
 inline void im_register_format(ImageFormat_t *fmt)
 {
