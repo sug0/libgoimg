@@ -80,6 +80,10 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     switch (color_type) {
     case PNG_COLOR_TYPE_GRAY:
         switch (bit_depth) {
+        case 1:
+        case 2:
+        case 4:
+            png_set_gray_1_2_4_to_8(png_ptr);
         case 8:
             img->size = img->w * img->h * sizeof(uint8_t);
             img->img = _xalloc(img->alloc, img->size);
@@ -119,7 +123,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 
     /* TODO: implement missing color spaces */
     case PNG_COLOR_TYPE_RGB:
-    case PNG_COLOR_TYPE_GRAY_ALPHA:
+    case PNG_COLOR_TYPE_GRAY_ALPHA: /* png_set_gray_to_rgb */
     case PNG_COLOR_TYPE_PALETTE:
     default:
         _im_maybe_jmp_err(0);
