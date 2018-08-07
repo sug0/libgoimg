@@ -110,8 +110,8 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
 done:
     if (likely(c_src.color)) free(c_src.color);
     if (likely(c_dst.color)) free(c_dst.color);
-	if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
-	if (likely(png_ptr)) png_destroy_write_struct(&png_ptr, &info_ptr);
+    if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+    if (likely(png_ptr)) png_destroy_write_struct(&png_ptr, &info_ptr);
 
     return err;
 }
