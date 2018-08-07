@@ -38,6 +38,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 {
     int err = 0;
 
+    png_bytepp row_pointers = NULL;
     png_structp png_ptr = NULL;
     png_infop info_ptr = NULL;
 
@@ -50,7 +51,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     _im_maybe_jmp_err(info_ptr);
 
     /* create jump joint to fall back to
-     * when an error occurs while reading the png info */
+     * when an error occurs while decoding png */
     _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
 
     /* set the read method -- wrap rf */
@@ -60,20 +61,13 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     /* read file info -- width, height, etc */
     png_read_info(png_ptr, info_ptr);
 
-    int color_type, bit_depth, pix_width, passes;
+    int color_type, bit_depth, pix_width;
 
     img->w = png_get_image_width(png_ptr, info_ptr);
     img->h = png_get_image_height(png_ptr, info_ptr);
 
     color_type = png_get_color_type(png_ptr, info_ptr);
     bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-    passes = png_set_interlace_handling(png_ptr);
-
-    png_read_update_info(png_ptr, info_ptr);
-
-    /* create jump joint to fall back to
-     * when an error occurs while decoding the pix rows */
-    _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
 
     /* determine amount of memory to allocate,
      * based on the color_type and bit_depth vars */
@@ -130,17 +124,21 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         _im_maybe_jmp_err(0);
     }
 
+    /* remaining info stuff */
+    png_read_update_info(png_ptr, info_ptr);
+
     /* zero out structure to make valgrind stfu */
     memset(img->img, 0, img->size);
 
-    /* perform actual decoding */
-    int y, pass;
+    /* initialize row pointers */
+    int y;
+    row_pointers = _xalloc(malloc, img->h * sizeof(png_bytepp));
 
-    for (pass = 0; pass < passes; pass++) {
-        for (y = 0; y < img->h; y++) {
-            png_read_row(png_ptr, img->img + y*img->w*pix_width, NULL);
-        }
-    }
+    for (y = 0; y < img->h; y++)
+        row_pointers[y] = img->img + y*img->w*pix_width;
+
+    /* perform actual decoding */
+    png_read_image(png_ptr, row_pointers);
 
     /* finish decoding */
     png_read_end(png_ptr, info_ptr);
@@ -148,6 +146,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 done:
     if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     if (likely(png_ptr)) png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+    if (likely(row_pointers)) free(row_pointers);
 
     return err;
 }
