@@ -8,23 +8,143 @@
 
 #define _im_maybe_jmp_err(CHK)  if (!(CHK)) {err = -1; goto done;}
 
-struct _png_state {
+struct _png_state_r {
+    rfun_t rf;
+    void *src;
+};
+
+struct _png_state_w {
     wfun_t wf;
     void *dst;
 };
 
+static void _png_read_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
+{
+    struct _png_state_r *s = (struct _png_state_r *)png_get_io_ptr(png_ptr);
+
+    if (s->rf(s->src, (char *)buf, (int)size) < 0)
+        png_error(png_ptr, "write function error");
+}
+
 static void _png_write_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
 {
-    struct _png_state *s = (struct _png_state *)png_get_io_ptr(png_ptr);
+    struct _png_state_w *s = (struct _png_state_w *)png_get_io_ptr(png_ptr);
 
     if (s->wf(s->dst, (char *)buf, (int)size) < 0)
         png_error(png_ptr, "write function error");
 }
 
-/* TODO */
 int im_png_dec(Image_t *img, rfun_t rf, void *src)
 {
-    return 0;
+    int err = 0;
+
+    png_structp png_ptr = NULL;
+    png_infop info_ptr = NULL;
+
+    /* initialize write */
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    _im_maybe_jmp_err(png_ptr);
+
+    /* initialize info */
+    info_ptr = png_create_info_struct(png_ptr);
+    _im_maybe_jmp_err(info_ptr);
+
+    /* create jump joint to fall back to
+     * when an error occurs while reading the png info */
+    _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
+
+    /* set the read method -- wrap rf */
+    struct _png_state_r s = {rf, src};
+    png_set_read_fn(png_ptr, &s, _png_read_fn);
+
+    /* read file info -- width, height, etc */
+    png_read_info(png_ptr, info_ptr);
+
+    int color_type, bit_depth, pix_width, passes;
+
+    img->w = png_get_image_width(png_ptr, info_ptr);
+    img->h = png_get_image_height(png_ptr, info_ptr);
+
+    color_type = png_get_color_type(png_ptr, info_ptr);
+    bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+    passes = png_set_interlace_handling(png_ptr);
+
+    png_read_update_info(png_ptr, info_ptr);
+
+    /* create jump joint to fall back to
+     * when an error occurs while decoding the pix rows */
+    _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
+
+    /* determine amount of memory to allocate,
+     * based on the color_type and bit_depth vars */
+    switch (color_type) {
+    case PNG_COLOR_TYPE_GRAY:
+        switch (bit_depth) {
+        case 8:
+            img->size = img->w * img->h * sizeof(uint8_t);
+            img->img = _xalloc(img->alloc, img->size);
+            img->color_model = im_colormodel_gray;
+            img->at = im_gray_at;
+            img->set = im_gray_set;
+            break;
+
+        /* TODO: implement gray16 */
+        case 16:
+        default:
+            _im_maybe_jmp_err(0);
+        }
+        pix_width = 1;
+        break;
+    case PNG_COLOR_TYPE_RGB_ALPHA:
+        switch (bit_depth) {
+        case 8:
+            img->size = img->w * img->h * sizeof(uint32_t);
+            img->img = _xalloc(img->alloc, img->size);
+            img->color_model = im_colormodel_nrgba;
+            img->at = im_nrgba_at;
+            img->set = im_nrgba_at;
+            break;
+        case 16:
+            img->size = img->w * img->h * sizeof(uint64_t);
+            img->img = _xalloc(img->alloc, img->size);
+            img->color_model = im_colormodel_nrgba64;
+            img->at = im_nrgba64_at;
+            img->set = im_nrgba64_at;
+            break;
+        default:
+            _im_maybe_jmp_err(0);
+        }
+        pix_width = 4;
+        break;
+
+    /* TODO: implement missing color spaces */
+    case PNG_COLOR_TYPE_RGB:
+    case PNG_COLOR_TYPE_GRAY_ALPHA:
+    case PNG_COLOR_TYPE_PALETTE:
+    default:
+        _im_maybe_jmp_err(0);
+    }
+
+    /* zero out structure to make valgrind stfu */
+    memset(img->img, 0, img->size);
+
+    /* perform actual decoding */
+    int y, pass;
+
+    for (pass = 0; pass < passes; pass++) {
+        for (y = 0; y < img->h; y++) {
+            png_read_row(png_ptr, img->img + y*img->w*pix_width, NULL);
+        }
+    }
+
+    /* finish decoding */
+    png_read_end(png_ptr, info_ptr);
+
+done:
+    if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+    if (likely(png_ptr)) png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+    return err;
 }
 
 int im_png_enc(Image_t *img, wfun_t wf, void *dst)
@@ -50,7 +170,7 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
 
     /* set the write method -- wrap wf */
-    struct _png_state s = {wf, dst};
+    struct _png_state_w s = {wf, dst};
     png_set_write_fn(png_ptr, &s, _png_write_fn, NULL);
 
     /* determine color type and bit depth */
