@@ -13,7 +13,7 @@
 
 typedef struct _s_im_image Image_t;
 typedef struct _s_imgformat ImageFormat_t;
-typedef struct _s_rgba32 RGBA128_t;
+typedef struct _s_rgba128 RGBA128_t;
 typedef struct _s_color Color_t;
 
 /* a color model function -- takes 
@@ -53,7 +53,7 @@ struct _s_im_image {
 
 /* represents a rgba color with 32-bit
  * components */
-struct _s_rgba32 {
+struct _s_rgba128 {
     uint32_t r, g, b, a;
 };
 
