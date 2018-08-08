@@ -77,7 +77,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         case 1:
         case 2:
         case 4:
-            png_set_gray_1_2_4_to_8(png_ptr);
+            png_set_expand_gray_1_2_4_to_8(png_ptr);
         case 8:
             img->size = img->w * img->h * sizeof(uint8_t);
             img->img = _xalloc(img->alloc, img->size);
@@ -123,6 +123,9 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     default:
         _im_maybe_jmp_err(0);
     }
+
+    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+        png_set_tRNS_to_alpha(png_ptr);
 
     /* remaining info stuff */
     png_read_update_info(png_ptr, info_ptr);
