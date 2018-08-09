@@ -49,7 +49,7 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
     struct _s_bufwriter s = {img->img, img->size};
 
     return (unlikely(rwcpy_r(_s_bufwrite, &s, rf, src,
-                             buf, sizeof(buf)) < 0)) ? -1 : 0;
+                             buf, sizeof(buf)) != img->size)) ? -1 : 0;
 }
 
 int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
