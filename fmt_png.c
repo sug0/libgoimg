@@ -23,7 +23,7 @@ static void _png_read_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
     struct _png_state_r *s = (struct _png_state_r *)png_get_io_ptr(png_ptr);
 
     if (_err_read(s->rf, s->src, (char *)buf, (int)size))
-        png_error(png_ptr, "write function error");
+        png_error(png_ptr, "read function error");
 }
 
 static void _png_write_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
@@ -61,7 +61,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     /* read file info -- width, height, etc */
     png_read_info(png_ptr, info_ptr);
 
-    int color_type, bit_depth, pix_width;
+    int color_type, bit_depth, pix_width, row_bytes;
 
     img->w = png_get_image_width(png_ptr, info_ptr);
     img->h = png_get_image_height(png_ptr, info_ptr);
@@ -79,12 +79,9 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         case 4:
             png_set_expand_gray_1_2_4_to_8(png_ptr);
         case 8:
-            img->size = img->w * img->h * sizeof(uint8_t);
-            img->img = _xalloc(img->alloc, img->size);
             img->color_model = im_colormodel_gray;
             img->at = im_gray_at;
             img->set = im_gray_set;
-            pix_width = sizeof(uint8_t);
             break;
 
         /* TODO: implement gray16 */
@@ -96,20 +93,14 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     case PNG_COLOR_TYPE_RGB_ALPHA:
         switch (bit_depth) {
         case 8:
-            img->size = img->w * img->h * sizeof(uint32_t);
-            img->img = _xalloc(img->alloc, img->size);
             img->color_model = im_colormodel_nrgba;
             img->at = im_nrgba_at;
             img->set = im_nrgba_at;
-            pix_width = sizeof(uint32_t);
             break;
         case 16:
-            img->size = img->w * img->h * sizeof(uint64_t);
-            img->img = _xalloc(img->alloc, img->size);
             img->color_model = im_colormodel_nrgba64;
             img->at = im_nrgba64_at;
             img->set = im_nrgba64_at;
-            pix_width = sizeof(uint64_t);
             break;
         default:
             _im_maybe_jmp_err(0);
@@ -129,6 +120,12 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 
     /* remaining info stuff */
     png_read_update_info(png_ptr, info_ptr);
+
+    /* alloc image */
+    row_bytes = png_get_rowbytes(png_ptr, info_ptr);
+    pix_width = row_bytes/img->w;
+    img->size = row_bytes * img->h;
+    img->img = _xalloc(img->alloc, img->size);
 
     /* zero out structure to make valgrind stfu */
     memset(img->img, 0, img->size);
