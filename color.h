@@ -32,7 +32,6 @@ enum _goimg_colors {
     GOIMG_NO_DEF_COLORS
 };
 
-
 /* guesses the most appropriate color to use
  * on a decoded image, based on the color model */
 extern Color_t im_newcolor_from_img(Image_t *img);
@@ -68,5 +67,8 @@ extern uint32_t im_decl_cmyk(uint32_t c, uint32_t m, uint32_t y, uint32_t k);
 extern void im_colormodel_cmyk(Color_t *dst, Color_t *src);
 extern void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color);
 extern Color_t im_newcolor_cmyk(void);
+extern Image_t im_newimg_cmyk(int w, int h, void *(*alloc)(size_t), void (*free)(void *));
+extern void im_cmyk_at(Image_t *img, int x, int y, Color_t *dst);
+extern void im_cmyk_set(Image_t *img, int x, int y, Color_t *src);
 
 #endif

@@ -419,3 +419,66 @@ inline Color_t im_newcolor_cmyk(void)
         .rgba128 = im_cmyk_convert_rgba128
     };
 }
+
+inline Image_t im_newimg_cmyk(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+{
+    size_t size = w * h * sizeof(uint32_t);
+    return (Image_t){
+        .alloc = alloc,
+        .free = free,
+        .img = _xalloc(alloc, size),
+        .size = size,
+        .w = w,
+        .h = h,
+        .color_model = im_colormodel_cmyk,
+        .at = im_cmyk_at,
+        .set = im_cmyk_set
+    };
+}
+
+void im_cmyk_at(Image_t *img, int x, int y, Color_t *dst)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
+        if (dst->color)
+            dst->free(dst->color);
+        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+        dst->size = sizeof(uint32_t);
+    }
+
+    if (unlikely(dst->c_id != GOIMG_COLOR_CMYK)) {
+        dst->c_id = GOIMG_COLOR_CMYK;
+        dst->rgba128 = im_cmyk_convert_rgba128;
+    }
+
+    *(uint32_t *)dst->color = ((uint32_t *)img->img)[y * img->w + x];
+}
+
+void im_cmyk_set(Image_t *img, int x, int y, Color_t *src)
+{
+    uint32_t color;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_CMYK)) {
+        RGBA128_t col;
+        uint32_t c, m, y, w;
+        src->rgba128(&col, src->color);
+
+        w = col.r;
+        if (w < col.g) w = col.g;
+        if (w < col.b) w = col.b;
+
+        if (w == 0) {
+            color = 0xff000000;
+        } else {
+            c = (w - col.r) * 0xffff / w;
+            m = (w - col.g) * 0xffff / w;
+            y = (w - col.b) * 0xffff / w;
+
+            color = im_decl_cmyk(GOIMG_CC(c), GOIMG_CC(m),
+                                 GOIMG_CC(y), GOIMG_CC(0xffff - w));
+        }
+    } else {
+        color = *(uint32_t *)src->color;
+    }
+
+    ((uint32_t *)img->img)[y * img->w + x] = color;
+}
