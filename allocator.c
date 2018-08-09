@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "allocator.h"
+#include "util.h"
 
 static void *_im_heap_alloc(void *arg, size_t size)
 {
@@ -67,5 +68,6 @@ void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
 
 inline void im_xfree(Allocator_t *allocator, void *ptr)
 {
-    allocator->free(allocator->data, ptr);
+    if (likely(ptr))
+        allocator->free(allocator->data, ptr);
 }
