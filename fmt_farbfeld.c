@@ -45,9 +45,11 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
     img->at = im_nrgba64_at;
     img->set = im_nrgba64_set;
 
+    char buf[8192];
     struct _s_bufwriter s = {img->img, img->size};
 
-    return (unlikely(rwcpy(_s_bufwrite, &s, rf, src) < 0)) ? -1 : 0;
+    return (unlikely(rwcpy_r(_s_bufwrite, &s, rf, src,
+                             buf, sizeof(buf)) < 0)) ? -1 : 0;
 }
 
 int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
