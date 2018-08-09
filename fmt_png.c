@@ -161,9 +161,6 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     png_structp png_ptr = NULL;
     png_infop info_ptr = NULL;
 
-    //Color_t c_src = {.color = NULL, .alloc = malloc, .free = free},
-    //        c_dst = {.color = NULL, .alloc = malloc, .free = free};
-
     /* initialize write */
     png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     _im_maybe_jmp_err(png_ptr);
@@ -196,9 +193,8 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
         bit_depth = 8;
         pix_width = sizeof(uint8_t);
     } else {
-        /* TODO: lossy conversion */
-        _im_maybe_jmp_err(0);
-        // goto lossy;
+        /* do lossy conversion */
+        goto lossy;
     }
 
     /* write header */
@@ -218,28 +214,38 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
 
     /* write final chunk */
     png_write_end(png_ptr, NULL);
-    //goto done;
+    goto done;
 
-//lossy:
-//    int x, y, err = 0;
-//    Color_t c_src = {.color = NULL, .alloc = malloc, .free = free},
-//            c_dst = {.color = NULL, .alloc = malloc, .free = free};
-//
-//    for (y = 0; y < img->h; y++) {
-//        for (x = 0; x < img->w; x++) {
-//            img->at(img, x, y, &c_src);
-//            im_colormodel_nrgba64(&c_dst, &c_src);
-//
-//            if (unlikely(wf(dst, (char *)c_dst.color, sizeof(uint64_t)) < 0)) {
-//                err = -1;
-//                goto done;
-//            }
-//        }
-//    }
-//
+lossy:;
+    /* write header */
+    png_set_IHDR(png_ptr, info_ptr,
+                 img->w, img->h,
+                 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE,
+                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+    /* write metadata stuff */
+    png_write_info(png_ptr, info_ptr);
+
+    int x;
+    uint32_t *row = _xalloc(malloc, sizeof(uint32_t) * img->w);
+
+    Color_t c_src = im_newcolor_from_img(img),
+            c_dst = im_newcolor_nrgba();
+
+    for (y = 0; y < img->h; y++) {
+        for (x = 0; x < img->w; x++) {
+            img->at(img, x, y, &c_src);
+            im_colormodel_nrgba(&c_dst, &c_src);
+            row[x] = *(uint32_t *)c_dst.color;
+        }
+        png_write_row(png_ptr, (png_bytep)row);
+    }
+
+    free(row);
+    free(c_src.color);
+    free(c_dst.color);
+
 done:
-    //if (likely(c_src.color)) free(c_src.color);
-    //if (likely(c_dst.color)) free(c_dst.color);
     if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     if (likely(png_ptr)) png_destroy_write_struct(&png_ptr, &info_ptr);
 
