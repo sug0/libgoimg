@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <goio.h>
-#include "image.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <winsock.h>
