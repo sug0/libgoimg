@@ -216,7 +216,7 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     png_write_end(png_ptr, NULL);
     goto done;
 
-lossy:;
+lossy:
     /* write header */
     png_set_IHDR(png_ptr, info_ptr,
                  img->w, img->h,
