@@ -3,6 +3,7 @@
 #include "image.h"
 #include "color.h"
 #include "util.h"
+#include "allocator.h"
 
 #include "fmt_farbfeld.h"
 #include "fmt_png.h"
@@ -73,10 +74,10 @@ ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src)
         msize = _img_formats[i].magic_size;
 
         if (!mbuf) {
-            mbuf = _xalloc(malloc, msize);
+            mbuf = im_xalloc(im_std_allocator, msize);
             mbufsz = msize;
         } else if (mbufsz < msize) {
-            mbuf = _xrealloc(realloc, mbuf, msize);
+            mbuf = im_xrealloc(im_std_allocator, mbuf, msize);
             mbufsz = msize;
         }
 

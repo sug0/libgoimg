@@ -26,8 +26,8 @@ void im_colormodel_nrgba(Color_t *dst, Color_t *src)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
     if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA)) {
@@ -73,22 +73,21 @@ void im_nrgba_convert_rgba128(RGBA128_t *rgba, void *color)
 inline Color_t im_newcolor_nrgba(void)
 {
     return (Color_t){
-        .alloc = malloc,
-        .free = free,
+        .allocator = im_std_allocator,
         .c_id = GOIMG_COLOR_NRGBA,
-        .color = _xcalloc(calloc, 1, sizeof(uint32_t)),
+        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t)),
         .size = sizeof(uint32_t),
         .rgba128 = im_nrgba_convert_rgba128
     };
 }
 
-inline Image_t im_newimg_nrgba(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+inline Image_t im_newimg_nrgba(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
+    allocator = allocator ?: im_std_allocator;
     return (Image_t){
-        .alloc = alloc,
-        .free = free,
-        .img = _xalloc(alloc, size),
+        .allocator = allocator,
+        .img = im_xalloc(allocator, size),
         .size = size,
         .w = w,
         .h = h,
@@ -102,8 +101,8 @@ void im_nrgba_at(Image_t *img, int x, int y, Color_t *dst)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
 
@@ -142,8 +141,8 @@ void im_colormodel_nrgba64(Color_t *dst, Color_t *src)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint64_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint64_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint64_t));
         dst->size = sizeof(uint64_t);
     }
     if (unlikely(dst->c_id != GOIMG_COLOR_NRGBA64)) {
@@ -184,22 +183,21 @@ void im_nrgba64_convert_rgba128(RGBA128_t *rgba, void *color)
 inline Color_t im_newcolor_nrgba64(void)
 {
     return (Color_t){
-        .alloc = malloc,
-        .free = free,
+        .allocator = im_std_allocator,
         .c_id = GOIMG_COLOR_NRGBA64,
-        .color = _xcalloc(calloc, 1, sizeof(uint64_t)),
+        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint64_t)),
         .size = sizeof(uint64_t),
         .rgba128 = im_nrgba64_convert_rgba128
     };
 }
 
-inline Image_t im_newimg_nrgba64(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+inline Image_t im_newimg_nrgba64(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint64_t);
+    allocator = allocator ?: im_std_allocator;
     return (Image_t){
-        .alloc = alloc,
-        .free = free,
-        .img = _xalloc(alloc, size),
+        .allocator = allocator,
+        .img = im_xalloc(allocator, size),
         .size = size,
         .w = w,
         .h = h,
@@ -213,8 +211,8 @@ void im_nrgba64_at(Image_t *img, int x, int y, Color_t *dst)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint64_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint64_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint64_t));
         dst->size = sizeof(uint64_t);
     }
 
@@ -248,8 +246,8 @@ void im_colormodel_gray(Color_t *dst, Color_t *src)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint8_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint8_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint8_t));
         dst->size = sizeof(uint8_t);
     }
     if (unlikely(dst->c_id != GOIMG_COLOR_GRAY)) {
@@ -287,22 +285,21 @@ void im_gray_convert_rgba128(RGBA128_t *rgba, void *color)
 inline Color_t im_newcolor_gray(void)
 {
     return (Color_t){
-        .alloc = malloc,
-        .free = free,
+        .allocator = im_std_allocator,
         .c_id = GOIMG_COLOR_GRAY,
-        .color = _xcalloc(calloc, 1, sizeof(uint8_t)),
+        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint8_t)),
         .size = sizeof(uint8_t),
         .rgba128 = im_gray_convert_rgba128
     };
 }
 
-inline Image_t im_newimg_gray(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+inline Image_t im_newimg_gray(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint8_t);
+    allocator = allocator ?: im_std_allocator;
     return (Image_t){
-        .alloc = alloc,
-        .free = free,
-        .img = _xalloc(alloc, size),
+        .allocator = allocator,
+        .img = im_xalloc(allocator, size),
         .size = size,
         .w = w,
         .h = h,
@@ -316,8 +313,8 @@ void im_gray_at(Image_t *img, int x, int y, Color_t *dst)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint8_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint8_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint8_t));
         dst->size = sizeof(uint8_t);
     }
 
@@ -355,8 +352,8 @@ void im_colormodel_cmyk(Color_t *dst, Color_t *src)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
     if (unlikely(dst->c_id != GOIMG_COLOR_CMYK)) {
@@ -411,22 +408,21 @@ void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color)
 inline Color_t im_newcolor_cmyk(void)
 {
     return (Color_t){
-        .alloc = malloc,
-        .free = free,
+        .allocator = im_std_allocator,
         .c_id = GOIMG_COLOR_CMYK,
-        .color = _xcalloc(calloc, 1, sizeof(uint32_t)),
+        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t)),
         .size = sizeof(uint32_t),
         .rgba128 = im_cmyk_convert_rgba128
     };
 }
 
-inline Image_t im_newimg_cmyk(int w, int h, void *(*alloc)(size_t), void (*free)(void *))
+inline Image_t im_newimg_cmyk(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
+    allocator = allocator ?: im_std_allocator;
     return (Image_t){
-        .alloc = alloc,
-        .free = free,
-        .img = _xalloc(alloc, size),
+        .allocator = allocator,
+        .img = im_xalloc(allocator, size),
         .size = size,
         .w = w,
         .h = h,
@@ -440,8 +436,8 @@ void im_cmyk_at(Image_t *img, int x, int y, Color_t *dst)
 {
     if (unlikely(!dst->color || (dst->color && dst->size < sizeof(uint32_t)))) {
         if (dst->color)
-            dst->free(dst->color);
-        dst->color = _xalloc(dst->alloc, sizeof(uint32_t));
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(uint32_t));
         dst->size = sizeof(uint32_t);
     }
 

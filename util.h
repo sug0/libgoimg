@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <goio.h>
+#include "image.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <winsock.h>
@@ -27,9 +28,6 @@
     unlikely(__err_write((WF), (DST), (BUF), (SIZE)))
 
 extern bool _m_match(char *magic, int msize, char *b, int bsize);
-extern void *_xalloc(void *(*malloc)(size_t), size_t size);
-extern void *_xcalloc(void *(*calloc)(size_t, size_t), size_t nmemb, size_t size);
-extern void *_xrealloc(void *(*realloc)(void *, size_t), void *m, size_t size);
 extern bool __err_read(rfun_t rf, void *src, char *buf, int size);
 extern bool __err_write(wfun_t wf, void *dst, char *buf, int size);
 

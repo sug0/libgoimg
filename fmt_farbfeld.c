@@ -40,7 +40,7 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
     img->h = ntohl(*(uint32_t *)(magic + 12));
 
     img->size = img->w * img->h * sizeof(uint64_t);
-    img->img = _xalloc(img->alloc, img->size);
+    img->img = im_xalloc(img->allocator, img->size);
     img->color_model = im_colormodel_nrgba64;
     img->at = im_nrgba64_at;
     img->set = im_nrgba64_set;

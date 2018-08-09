@@ -125,14 +125,14 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     row_bytes = png_get_rowbytes(png_ptr, info_ptr);
     pix_width = row_bytes/img->w;
     img->size = row_bytes * img->h;
-    img->img = _xalloc(img->alloc, img->size);
+    img->img = im_xalloc(img->allocator, img->size);
 
     /* zero out structure to make valgrind stfu */
     memset(img->img, 0, img->size);
 
     /* initialize row pointers */
     int y;
-    row_pointers = _xalloc(malloc, img->h * sizeof(png_bytepp));
+    row_pointers = im_xalloc(im_std_allocator, img->h * sizeof(png_bytepp));
 
     for (y = 0; y < img->h; y++)
         row_pointers[y] = img->img + y*img->w*pix_width;
@@ -222,7 +222,7 @@ lossy:
     png_write_info(png_ptr, info_ptr);
 
     int x;
-    uint32_t *row = _xalloc(malloc, sizeof(uint32_t) * img->w);
+    uint32_t *row = im_xalloc(im_std_allocator, sizeof(uint32_t) * img->w);
 
     Color_t c_src = im_newcolor_from_img(img),
             c_dst = im_newcolor_nrgba();

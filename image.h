@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <goio.h>
+#include "allocator.h"
 
 /* save up to GOIMG_NO_FMTS number of image
  * formats in the internal array */
@@ -11,6 +12,8 @@
     #define GOIMG_NO_FMTS  64
 #endif
 
+/* typedefs for the struct types;
+ * their respective descriptions are below */
 typedef struct _s_im_image Image_t;
 typedef struct _s_imgformat ImageFormat_t;
 typedef struct _s_rgba128 RGBA128_t;
@@ -36,10 +39,7 @@ typedef void (*im_setfun_t)(Image_t *img, int x, int y, Color_t *src);
 /* represents an image to be encoded or 
  * decoded */
 struct _s_im_image {
-    /* parameters that need to be initialized
-     * before a call to decode */
-    void *(*alloc)(size_t size);
-    void (*free)(void *img);
+    Allocator_t *allocator;
 
     /* decoded parameters */
     void *img;
@@ -59,8 +59,7 @@ struct _s_rgba128 {
 
 /* represents a generic color */
 struct _s_color {
-    void *(*alloc)(size_t size);
-    void (*free)(void *color);
+    Allocator_t *allocator;
 
     int c_id;
     void *color;
