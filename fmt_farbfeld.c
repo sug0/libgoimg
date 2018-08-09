@@ -32,7 +32,7 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
     char magic[16];
 
     /* read the magic */
-    if (unlikely(rf(src, magic, 16) < 0))
+    if (_err_read(rf, src, magic, 16))
         return -1;
 
     /* read dims */
@@ -53,18 +53,18 @@ int im_farbfeld_dec(Image_t *img, rfun_t rf, void *src)
 int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
 {
     /* write the magic */
-    if (unlikely(wf(dst, "farbfeld", 8) < 0))
+    if (_err_write(wf, dst, "farbfeld", 8))
         return -1;
 
     /* write dimensions */
     uint32_t dim;
 
     dim = htonl((uint32_t)img->w);
-    if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
+    if (_err_write(wf, dst, (char *)&dim, sizeof(uint32_t)))
         return -1;
 
     dim = htonl((uint32_t)img->h);
-    if (unlikely(wf(dst, (char *)&dim, sizeof(uint32_t)) < 0))
+    if (_err_write(wf, dst, (char *)&dim, sizeof(uint32_t)))
         return -1;
 
     /*
@@ -72,7 +72,7 @@ int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
      * */
 
     if (likely(img->color_model == im_colormodel_nrgba64))
-        return (unlikely(wf(dst, (char *)img->img, img->size) < 0)) ? -1 : 0;
+        return (_err_write(wf, dst, (char *)img->img, img->size)) ? -1 : 0;
 
     /* lossy */
     int x, y, err = 0;
@@ -84,7 +84,7 @@ int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
             img->at(img, x, y, &c_src);
             im_colormodel_nrgba64(&c_dst, &c_src);
 
-            if (unlikely(wf(dst, (char *)c_dst.color, sizeof(uint64_t)) < 0)) {
+            if (_err_write(wf, dst, (char *)c_dst.color, sizeof(uint64_t))) {
                 err = -1;
                 goto done;
             }

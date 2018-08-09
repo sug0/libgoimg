@@ -22,7 +22,7 @@ static void _png_read_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
 {
     struct _png_state_r *s = (struct _png_state_r *)png_get_io_ptr(png_ptr);
 
-    if (s->rf(s->src, (char *)buf, (int)size) < 0)
+    if (_err_read(s->rf, s->src, (char *)buf, (int)size))
         png_error(png_ptr, "write function error");
 }
 
@@ -30,7 +30,7 @@ static void _png_write_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
 {
     struct _png_state_w *s = (struct _png_state_w *)png_get_io_ptr(png_ptr);
 
-    if (s->wf(s->dst, (char *)buf, (int)size) < 0)
+    if (_err_write(s->wf, s->dst, (char *)buf, (int)size))
         png_error(png_ptr, "write function error");
 }
 

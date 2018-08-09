@@ -50,3 +50,13 @@ void *_xrealloc(void *(*realloc)(void *, size_t), void *m, size_t size)
 
     return m;
 }
+
+inline bool __err_write(wfun_t wf, void *dst, char *buf, int size)
+{
+    return wf(dst, buf, size) < size;
+}
+
+inline bool __err_read(rfun_t rf, void *src, char *buf, int size)
+{
+    return rf(src, buf, size) < size;
+}
