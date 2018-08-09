@@ -209,8 +209,6 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     for (y = 0; y < img->h; y++)
         png_write_row(png_ptr, img->img + y*img->w*pix_width);
 
-    /* write final chunk */
-    png_write_end(png_ptr, NULL);
     goto done;
 
 lossy:
@@ -243,6 +241,9 @@ lossy:
     free(c_dst.color);
 
 done:
+    /* write final chunk */
+    png_write_end(png_ptr, NULL);
+
     if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     if (likely(png_ptr)) png_destroy_write_struct(&png_ptr, &info_ptr);
 
