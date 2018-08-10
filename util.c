@@ -14,10 +14,10 @@ bool _m_match(char *magic, int msize, char *b, int bsize)
 
 inline bool __err_write(wfun_t wf, void *dst, char *buf, int size)
 {
-    return wf(dst, buf, size) < size;
+    return wf(dst, buf, size) < 0;
 }
 
 inline bool __err_read(rfun_t rf, void *src, char *buf, int size)
 {
-    return rf(src, buf, size) < size;
+    return rf(src, buf, size) < 0;
 }

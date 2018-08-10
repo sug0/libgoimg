@@ -90,6 +90,17 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
             _im_maybe_jmp_err(0);
         }
         break;
+    case PNG_COLOR_TYPE_RGB:
+        switch (bit_depth) {
+        case 8:
+            png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+            break;
+        case 16:
+            png_set_filler(png_ptr, 0xffff, PNG_FILLER_AFTER);
+            break;
+        default:
+            _im_maybe_jmp_err(0);
+        }
     case PNG_COLOR_TYPE_RGB_ALPHA:
         switch (bit_depth) {
         case 8:
@@ -108,7 +119,6 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         break;
 
     /* TODO: implement missing color spaces */
-    case PNG_COLOR_TYPE_RGB:
     case PNG_COLOR_TYPE_GRAY_ALPHA: /* png_set_gray_to_rgb */
     case PNG_COLOR_TYPE_PALETTE:
     default:
