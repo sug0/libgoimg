@@ -125,9 +125,6 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
         _im_maybe_jmp_err(0);
     }
 
-    if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
-        png_set_tRNS_to_alpha(png_ptr);
-
     /* remaining info stuff */
     png_read_update_info(png_ptr, info_ptr);
 
