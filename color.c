@@ -9,6 +9,8 @@ inline Color_t im_newcolor_from_img(Image_t *img)
         return im_newcolor_nrgba64();
     else if (img->color_model == im_colormodel_gray)
         return im_newcolor_gray();
+    else if (img->color_model == im_colormodel_gray16)
+        return im_newcolor_gray16();
     else if (img->color_model == im_colormodel_cmyk)
         return im_newcolor_cmyk();
     else

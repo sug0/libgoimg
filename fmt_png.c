@@ -92,9 +92,11 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
             img->at = im_gray_at;
             img->set = im_gray_set;
             break;
-
-        /* TODO: implement gray16 */
         case 16:
+            img->color_model = im_colormodel_gray16;
+            img->at = im_gray16_at;
+            img->set = im_gray16_set;
+            break;
         default:
             _im_maybe_jmp_err(0);
         }
@@ -202,6 +204,10 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
         color_type = PNG_COLOR_TYPE_GRAY;
         bit_depth = 8;
         pix_width = sizeof(uint8_t);
+    } else if (img->color_model == im_colormodel_gray16) {
+        color_type = PNG_COLOR_TYPE_GRAY;
+        bit_depth = 16;
+        pix_width = sizeof(uint16_t);
     } else {
         /* do lossy conversion */
         goto lossy;
