@@ -1,5 +1,5 @@
-#ifndef GOIMG_H
-#define GOIMG_H
+#ifndef GOIMG_IMAGE_H
+#define GOIMG_IMAGE_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -92,6 +92,13 @@ extern ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src);
 /* encodes an image into a known format; returns a negative
  * integer on error, and 0 on success */
 extern int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst);
+
+/* allocates and returns a new image with the given params */
+extern Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocator);
+
+/* allocate an exact copy of 'src' using the
+ * allocator of 'dst'*/
+extern void im_cpy(Image_t *dst, Image_t *src);
 
 /* returns a pointer to an image format 'fmt',
  * or NULL, if no such format is registered */

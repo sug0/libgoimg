@@ -1,5 +1,5 @@
-#ifndef GOIMG_COLOR_RGBA_H
-#define GOIMG_COLOR_RGBA_H
+#ifndef GOIMG_COLOR_H
+#define GOIMG_COLOR_H
 
 #include "image.h"
 #include "allocator.h"

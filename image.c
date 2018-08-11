@@ -105,3 +105,36 @@ int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst)
 
     return -1;
 }
+
+inline void im_cpy(Image_t *dst, Image_t *src)
+{
+    if (unlikely(!dst->img || (dst->img && dst->size < src->size))) {
+        if (dst->img)
+            im_xfree(dst->allocator, dst->img);
+        dst->img = im_xalloc(dst->allocator, src->size);
+    }
+
+    memcpy(dst->img, src->img, src->size);
+    dst->size = src->size;
+    dst->w = src->w;
+    dst->h = src->h;
+    dst->color_model = src->color_model;
+    dst->at = src->at;
+    dst->set = src->set;
+}
+
+inline Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocator)
+{
+    if (color_model == im_colormodel_nrgba)
+        return im_newimg_nrgba(w, h, allocator);
+    else if (color_model == im_colormodel_nrgba64)
+        return im_newimg_nrgba64(w, h, allocator);
+    else if (color_model == im_colormodel_gray)
+        return im_newimg_gray(w, h, allocator);
+    else if (color_model == im_colormodel_gray16)
+        return im_newimg_gray16(w, h, allocator);
+    else if (color_model == im_colormodel_cmyk)
+        return im_newimg_cmyk(w, h, allocator);
+    else
+        return im_newimg_nrgba(w, h, allocator);
+}
