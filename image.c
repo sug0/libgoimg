@@ -55,7 +55,7 @@ inline int im_register_color(void)
 
 ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src)
 {
-    char buf[8192];
+    char buf[16384];
     BufferedReader_t br = {
         .rf = rf,
         .src = src,
