@@ -132,10 +132,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     row_bytes = png_get_rowbytes(png_ptr, info_ptr);
     pix_width = row_bytes/img->w;
     img->size = row_bytes * img->h;
-    img->img = im_xalloc(img->allocator, img->size);
-
-    /* zero out structure to make valgrind stfu */
-    memset(img->img, 0, img->size);
+    img->img = im_xcalloc(img->allocator, 1, img->size);
 
     /* initialize row pointers */
     int y;
