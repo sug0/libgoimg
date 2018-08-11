@@ -59,7 +59,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
     info_ptr = png_create_info_struct(png_ptr);
     _im_maybe_jmp_err(info_ptr);
 
-    /* create jump joint to fall back to
+    /* create jump point to fall back to
      * when an error occurs while decoding png */
     _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
 
@@ -179,7 +179,7 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
     info_ptr = png_create_info_struct(png_ptr);
     _im_maybe_jmp_err(info_ptr);
 
-    /* create jump joint when
+    /* create jump point when
      * an error occurs during creation of png */
     _im_maybe_jmp_err(!setjmp(png_jmpbuf(png_ptr)));
 
