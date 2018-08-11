@@ -13,7 +13,7 @@ static int _color_id_counter = GOIMG_NO_DEF_COLORS - 1;
 
 /* this array is used to store new image formats */
 static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
-    /* farbfeld */
+    /* 1. farbfeld */
     {
         .magic = "farbfeld????????",
         .magic_size = 16,
@@ -21,7 +21,7 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .decode = im_farbfeld_dec,
         .encode = im_farbfeld_enc,
     },
-    /* PNG */
+    /* 2. PNG */
     {
         .magic = "\x89PNG\r\n\x1a\n",
         .magic_size = 8,
@@ -30,7 +30,7 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .encode = im_png_enc,
     },
 };
-static int _img_format_i = sizeof(_img_formats)/sizeof(_img_formats[0]);
+static int _img_format_i = 2;
 
 inline void im_register_format(ImageFormat_t *fmt)
 {
