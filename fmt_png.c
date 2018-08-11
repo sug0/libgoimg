@@ -21,9 +21,18 @@ struct _png_state_w {
 static void _png_read_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
 {
     struct _png_state_r *s = (struct _png_state_r *)png_get_io_ptr(png_ptr);
+    size_t r = 0;
+    int n;
 
-    if (_err_read(s->rf, s->src, (char *)buf, (int)size))
-        png_error(png_ptr, "read function error");
+    do {
+        n = s->rf(s->src, (char *)(buf + r), (int)size);
+
+        if (unlikely(n < 0))
+            png_error(png_ptr, "read function error");
+
+        size -= n;
+        r += n;
+    } while (size > 0);
 }
 
 static void _png_write_fn(png_structp png_ptr, png_bytep buf, png_size_t size)
