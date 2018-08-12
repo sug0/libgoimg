@@ -37,7 +37,7 @@ void *im_xalloc(Allocator_t *allocator, size_t size)
 {
     void *m = allocator->alloc(allocator->data, size);
 
-    if (!m) {
+    if (unlikely(!m)) {
         fprintf(stderr, "libgoimg: failed to allocate memory...\n");
         exit(1);
     }
@@ -58,7 +58,7 @@ void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
 {
     void *m = allocator->realloc(allocator->data, ptr, size);
 
-    if (!m) {
+    if (unlikely(!m)) {
         fprintf(stderr, "libgoimg: failed to allocate memory...\n");
         exit(1);
     }
