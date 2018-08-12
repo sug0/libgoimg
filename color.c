@@ -58,16 +58,16 @@ void im_nrgba_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->r = (*(uint32_t *)color & 0xff);
 
     rgba->r |= rgba->r << 8;
-    rgba->r *= rgba->a;
-    rgba->r /= 0xff;
+    //rgba->r *= rgba->a;
+    //rgba->r /= 0xff;
 
     rgba->g |= rgba->g << 8;
-    rgba->g *= rgba->a;
-    rgba->g /= 0xff;
+    //rgba->g *= rgba->a;
+    //rgba->g /= 0xff;
 
     rgba->b |= rgba->b << 8;
-    rgba->b *= rgba->a;
-    rgba->b /= 0xff;
+    //rgba->b *= rgba->a;
+    //rgba->b /= 0xff;
 
     rgba->a |= rgba->a << 8;
 }
