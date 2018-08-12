@@ -7,6 +7,7 @@
 
 #include "fmt_farbfeld.h"
 #include "fmt_png.h"
+#include "fmt_jpeg.h"
 
 /* this variable is used to register new color formats */
 static int _color_id_counter = GOIMG_NO_DEF_COLORS - 1;
@@ -29,8 +30,16 @@ static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
         .decode = im_png_dec,
         .encode = im_png_enc,
     },
+    /* 3. JPEG */
+    {
+        .magic = "\xff\xd8\xff",
+        .magic_size = 3,
+        .name = "JPEG",
+        .decode = im_jpeg_dec,
+        .encode = im_jpeg_enc,
+    },
 };
-static int _img_format_i = 2;
+static int _img_format_i = 3;
 
 inline void im_register_format(ImageFormat_t *fmt)
 {

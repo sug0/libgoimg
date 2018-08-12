@@ -164,10 +164,11 @@ static void _jpeg_goio_dest(j_compress_ptr cinfo, wfun_t wf, void *dst)
 
 int im_jpeg_dec(Image_t *img, rfun_t rf, void *src)
 {
-    return 0;
+    fprintf(stderr, "decoding a jpeg file!\n");
+    return -1;
 }
 
 int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
 {
-    return 0;
+    return -1;
 }
