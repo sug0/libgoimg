@@ -5,6 +5,7 @@
 
 #include "color.h"
 #include "fmt_jpeg.h"
+#include "util.h"
 
 struct _src_mgr {
     struct jpeg_source_mgr pub;
@@ -28,7 +29,7 @@ static boolean _fill_input_buffer(j_decompress_ptr cinfo)
 
     n = m_src->rf(m_src->src, m_src->buf, sizeof(m_src->buf));
 
-    if (n <= 0) {
+    if (unlikely(n <= 0)) {
         if (m_src->start_of_file)
             ERREXIT(cinfo, JERR_INPUT_EMPTY);
 
@@ -49,7 +50,7 @@ static void _skip_input_data(j_decompress_ptr cinfo, long n)
 {
     struct jpeg_source_mgr *src = cinfo->src;
 
-    if (n > 0) {
+    if (likely(n > 0)) {
         while (n > (long)src->bytes_in_buffer) {
             n -= (long)src->bytes_in_buffer;
             src->fill_input_buffer(cinfo);
@@ -94,6 +95,8 @@ static void _jpeg_goio_src(j_decompress_ptr cinfo, rfun_t rf, void *src)
 
 /* -------------------------------------------------------------------------- */
 
+#define __WSZ  sizeof(m_dst->buf)
+
 struct _dst_mgr {
     struct jpeg_destination_mgr pub;
 
@@ -102,9 +105,59 @@ struct _dst_mgr {
     char buf[8192];
 };
 
+static void _init_destination(j_compress_ptr cinfo)
+{
+    struct _dst_mgr *m_dst = (struct _dst_mgr *)cinfo->dest;
+    m_dst->pub.next_output_byte = (JOCTET *)m_dst->buf;
+    m_dst->pub.free_in_buffer = __WSZ;
+}
+
+static boolean _empty_output_buffer(j_compress_ptr cinfo)
+{
+    struct _dst_mgr *m_dst = (struct _dst_mgr *)cinfo->dest;
+
+    if (unlikely(m_dst->wf(m_dst->dst, m_dst->buf, __WSZ) != __WSZ))
+        ERREXIT(cinfo, JERR_FILE_WRITE);
+
+    m_dst->pub.next_output_byte = (JOCTET *)m_dst->buf;
+    m_dst->pub.free_in_buffer = __WSZ;
+
+    return TRUE;
+}
+
+static void _term_destination(j_compress_ptr cinfo)
+{
+    struct _dst_mgr *m_dst = (struct _dst_mgr *)cinfo->dest;
+    size_t n = __WSZ - m_dst->pub.free_in_buffer;
+
+    if (unlikely(n > 0 && m_dst->wf(m_dst->dst, m_dst->buf, n) != n))
+        ERREXIT(cinfo, JERR_FILE_WRITE);
+}
+
+#undef __WSZ
+
 static void _jpeg_goio_dest(j_compress_ptr cinfo, wfun_t wf, void *dst)
 {
-    /* implement this */
+    struct _dst_mgr *m_dst;
+
+    if (!cinfo->dest) {
+        cinfo->dest = (struct jpeg_destination_mgr *)
+            cinfo->mem->alloc_small((j_common_ptr)cinfo,
+                                    JPOOL_PERMANENT,
+                                    sizeof(struct _dst_mgr));
+    }
+
+    /* retrieve the pointer to the custom writer */
+    m_dst = (struct _dst_mgr *)cinfo->dest;
+
+    /* public stuff */
+    m_dst->pub.init_destination = _init_destination;
+    m_dst->pub.empty_output_buffer = _empty_output_buffer;
+    m_dst->pub.term_destination = _term_destination;
+
+    /* private stuff */
+    m_dst->wf = wf;
+    m_dst->dst= dst;
 }
 
 /* -------------------------------------------------------------------------- */
