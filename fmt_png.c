@@ -268,3 +268,18 @@ done:
 
     return err;
 }
+
+/* -------------------------------------------------------------------------- */
+
+static ImageFormat_t _im_fmt_png = {
+    .magic = "\x89PNG\r\n\x1a\n",
+    .magic_size = 8,
+    .name = "PNG",
+    .decode = im_png_dec,
+    .encode = im_png_enc,
+};
+
+inline void im_register_format_png(void)
+{
+    im_register_format(&_im_fmt_png);
+}

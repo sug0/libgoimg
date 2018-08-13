@@ -99,3 +99,18 @@ done:
 
     return err;
 }
+
+/* -------------------------------------------------------------------------- */
+
+static ImageFormat_t _im_fmt_farbfeld = {
+    .magic = "farbfeld????????",
+    .magic_size = 16,
+    .name = "farbfeld",
+    .decode = im_farbfeld_dec,
+    .encode = im_farbfeld_enc,
+};
+
+inline void im_register_format_farbfeld(void)
+{
+    im_register_format(&_im_fmt_farbfeld);
+}

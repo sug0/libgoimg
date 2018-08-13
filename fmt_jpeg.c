@@ -172,3 +172,18 @@ int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
 {
     return -1;
 }
+
+/* -------------------------------------------------------------------------- */
+
+static ImageFormat_t _im_fmt_jpeg = {
+    .magic = "\xff\xd8\xff",
+    .magic_size = 3,
+    .name = "JPEG",
+    .decode = im_jpeg_dec,
+    .encode = im_jpeg_enc,
+};
+
+inline void im_register_format_jpeg(void)
+{
+    im_register_format(&_im_fmt_jpeg);
+}

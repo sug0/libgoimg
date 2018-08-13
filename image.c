@@ -5,41 +5,36 @@
 #include "util.h"
 #include "allocator.h"
 
+/* this format is compiled by default */
 #include "fmt_farbfeld.h"
+
+/* compile with png support -- use libpng */
+#ifdef GOIMG_COMPILE_FMT_PNG
 #include "fmt_png.h"
+#endif
+
+/* compile with jpeg support -- use libjpeg-turbo */
+#ifdef GOIMG_COMPILE_FMT_JPEG
 #include "fmt_jpeg.h"
+#endif
 
 /* this variable is used to register new color formats */
 static int _color_id_counter = GOIMG_NO_DEF_COLORS - 1;
 
 /* this array is used to store new image formats */
-static ImageFormat_t _img_formats[GOIMG_NO_FMTS] = {
-    /* 1. farbfeld */
-    {
-        .magic = "farbfeld????????",
-        .magic_size = 16,
-        .name = "farbfeld",
-        .decode = im_farbfeld_dec,
-        .encode = im_farbfeld_enc,
-    },
-    /* 2. PNG */
-    {
-        .magic = "\x89PNG\r\n\x1a\n",
-        .magic_size = 8,
-        .name = "PNG",
-        .decode = im_png_dec,
-        .encode = im_png_enc,
-    },
-    /* 3. JPEG */
-    {
-        .magic = "\xff\xd8\xff",
-        .magic_size = 3,
-        .name = "JPEG",
-        .decode = im_jpeg_dec,
-        .encode = im_jpeg_enc,
-    },
-};
-static int _img_format_i = 3;
+static ImageFormat_t _img_formats[GOIMG_NO_FMTS];
+static int _img_format_i = 0;
+
+inline void im_load_defaults(void)
+{
+    im_register_format_farbfeld();
+#ifdef GOIMG_COMPILE_FMT_PNG
+    im_register_format_png();
+#endif
+#ifdef GOIMG_COMPILE_FMT_JPEG
+    im_register_format_jpeg();
+#endif
+}
 
 inline void im_register_format(ImageFormat_t *fmt)
 {

@@ -104,4 +104,9 @@ extern void im_cpy(Image_t *dst, Image_t *src);
  * or NULL, if no such format is registered */
 extern ImageFormat_t *im_get_format(char *fmt);
 
+/* load the compiled formats -- this
+ * function should be called before any
+ * sort of image decoding/encoding has taken place */
+extern void im_load_defaults(void);
+
 #endif

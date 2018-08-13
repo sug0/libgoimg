@@ -3,6 +3,7 @@
 
 #include "image.h"
 
+extern void im_register_format_jpeg(void);
 extern int im_jpeg_dec(Image_t *img, rfun_t rf, void *src);
 extern int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst);
 
