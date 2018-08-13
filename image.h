@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <goio.h>
+#include "goio.h"
 #include "allocator.h"
 
 /* save up to GOIMG_NO_FMTS number of image

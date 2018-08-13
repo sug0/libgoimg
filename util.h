@@ -2,7 +2,7 @@
 #define GOIMG_UTIL_H
 
 #include <stdbool.h>
-#include <goio.h>
+#include "goio.h"
 
 #if defined(_WIN32) || defined(_WIN64)
     #include <winsock.h>

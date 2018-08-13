@@ -25,7 +25,7 @@ def sys(*args):
     return os.system(cmd)
 
 def build():
-    files = ['allocator', 'color', 'image', 'util', 'fmt_farbfeld']
+    files = ['goio', 'allocator', 'color', 'image', 'util', 'fmt_farbfeld']
     ccopt = '-std=c99 -pedantic -Wall -O2 ' + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
