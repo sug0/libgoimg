@@ -23,9 +23,7 @@ def find_cc():
     return which('gcc') or which('clang')
 
 def transform_fmt(fmt):
-    d = '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
-    l = '-l%s' % fmt
-    return ' '.join((d, l))
+    return '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
 
 def build_fmt_opts(files):
     if len(argv) < 2:
