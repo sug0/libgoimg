@@ -147,10 +147,11 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 
     /* initialize row pointers */
     int y;
+    png_bytep imgdata = img->img;
     row_pointers = im_xalloc(im_std_allocator, img->h * sizeof(png_bytepp));
 
     for (y = 0; y < img->h; y++)
-        row_pointers[y] = img->img + y*img->w*pix_width;
+        row_pointers[y] = imgdata + y*img->w*pix_width;
 
     /* perform actual decoding */
     png_read_image(png_ptr, row_pointers);
@@ -224,9 +225,10 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
 
     /* write rows */
     int y;
+    png_bytep imgdata = img->img;
 
     for (y = 0; y < img->h; y++)
-        png_write_row(png_ptr, img->img + y*img->w*pix_width);
+        png_write_row(png_ptr, imgdata + y*img->w*pix_width);
 
     goto done;
 

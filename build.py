@@ -29,15 +29,20 @@ def build():
     ccopt = '-std=c99 -pedantic -Wall -O2 ' + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
+    objs = [f+'.o' for f in files]
+    cfiles = [f+'.c' for f in files]
+
     # build .o files
-    for f in files:
-        assert sys('cc', ccopt, '-c', f+'.c') == 0
+    for f in cfiles:
+        assert sys('cc', ccopt, '-c', f) == 0
 
     # pack libgoimg.a
+    assert sys('ar rcs', outlib, *objs) == 0
+    assert sys('ranlib', outlib) == 0
 
     # cleanup .o files
-    for f in files:
-        os.remove(f+'.o')
+    for o in objs:
+        os.remove(o)
 
 if __name__ == '__main__':
     build()
