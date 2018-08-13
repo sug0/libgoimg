@@ -1,6 +1,8 @@
 #ifndef GOIMG_ALLOCATOR_H
 #define GOIMG_ALLOCATOR_H
 
+#include <stdlib.h>
+
 /* represents an allocator with the possibility
  * to pass in a user data void* argument */
 typedef struct _s_allocator Allocator_t;
