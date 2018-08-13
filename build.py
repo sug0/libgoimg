@@ -2,25 +2,25 @@ import os
 
 from sys import exit, argv
 
+def is_exe(fpath):
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
 def which(program):
-    import os
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    if os.name == 'nt':
+        program += '.exe'
 
     fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
+
+    if fpath and is_exe(program):
+        return program
     else:
         for path in os.environ["PATH"].split(os.pathsep):
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 return exe_file
 
-    return None
-
 def find_cc():
-    return which('cc') or which('gcc') or which('clang')
+    return which('gcc') or which('clang')
 
 def transform_fmt(fmt):
     d = '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
