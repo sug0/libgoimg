@@ -2,6 +2,26 @@ import os
 
 from sys import exit, argv
 
+def which(program):
+    import os
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(program)
+    if fpath:
+        if is_exe(program):
+            return program
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return exe_file
+
+    return None
+
+def find_cc():
+    return which('cc') or which('gcc') or which('clang')
+
 def transform_fmt(fmt):
     d = '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
     l = '-l%s' % fmt
@@ -33,8 +53,9 @@ def build():
     cfiles = [f+'.c' for f in files]
 
     # build .o files
+    cc = find_cc()
     for f in cfiles:
-        assert sys('cc', ccopt, '-c', f) == 0
+        assert sys(cc, ccopt, '-c', f) == 0
 
     # pack libgoimg.a
     assert sys('ar rcs', outlib, *objs) == 0
