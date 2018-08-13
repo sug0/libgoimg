@@ -86,7 +86,7 @@ inline Color_t im_newcolor_nrgba(void)
 inline Image_t im_newimg_nrgba(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
-    allocator = allocator ?: im_std_allocator;
+    allocator = allocator ? allocator : im_std_allocator;
     return (Image_t){
         .allocator = allocator,
         .img = im_xalloc(allocator, size),
@@ -196,7 +196,7 @@ inline Color_t im_newcolor_nrgba64(void)
 inline Image_t im_newimg_nrgba64(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint64_t);
-    allocator = allocator ?: im_std_allocator;
+    allocator = allocator ? allocator : im_std_allocator;
     return (Image_t){
         .allocator = allocator,
         .img = im_xalloc(allocator, size),
@@ -298,7 +298,7 @@ inline Color_t im_newcolor_gray(void)
 inline Image_t im_newimg_gray(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint8_t);
-    allocator = allocator ?: im_std_allocator;
+    allocator = allocator ? allocator : im_std_allocator;
     return (Image_t){
         .allocator = allocator,
         .img = im_xalloc(allocator, size),
@@ -394,7 +394,7 @@ inline Color_t im_newcolor_gray16(void)
 inline Image_t im_newimg_gray16(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint16_t);
-    allocator = allocator ?: im_std_allocator;
+    allocator = allocator ? allocator : im_std_allocator;
     return (Image_t){
         .allocator = allocator,
         .img = im_xalloc(allocator, size),
@@ -517,7 +517,7 @@ inline Color_t im_newcolor_cmyk(void)
 inline Image_t im_newimg_cmyk(int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
-    allocator = allocator ?: im_std_allocator;
+    allocator = allocator ? allocator : im_std_allocator;
     return (Image_t){
         .allocator = allocator,
         .img = im_xalloc(allocator, size),

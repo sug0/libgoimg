@@ -13,6 +13,7 @@ struct _s_bufwriter {
 static int _s_bufwrite(void *dst, char *buf, int size)
 {
     struct _s_bufwriter *s = (struct _s_bufwriter *)dst;
+    char *dstbuf = s->buf;
 
     if (unlikely(!s->avail))
         return 0;
@@ -22,7 +23,8 @@ static int _s_bufwrite(void *dst, char *buf, int size)
 
     memcpy(s->buf, buf, size);
     s->avail -= size;
-    s->buf += size;
+    dstbuf += size;
+    s->buf = dstbuf;
 
     return size;
 }
