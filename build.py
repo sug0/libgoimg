@@ -40,7 +40,9 @@ def build_fmt_opts(files):
 def sys(*args):
     cmd = ' '.join(args)
     print(cmd)
-    return os.system(cmd)
+    code = os.system(cmd)
+    if code != 0:
+        exit(code)
 
 def ppath(prefix, *args):
     return '%s%s%s' % (prefix, os.sep, os.sep.join(args))
@@ -56,11 +58,11 @@ def build(install=None):
     # build .o files
     cc = find_cc()
     for f in cfiles:
-        assert sys(cc, ccopt, '-c', f) == 0
+        sys(cc, ccopt, '-c', f)
 
     # pack libgoimg.a
-    assert sys('ar rcs', outlib, *objs) == 0
-    assert sys('ranlib', outlib) == 0
+    sys('ar rcs', outlib, *objs)
+    sys('ranlib', outlib)
 
     # cleanup .o files
     for o in objs:
@@ -69,10 +71,10 @@ def build(install=None):
     # install
     if install:
         hfiles = ' '.join(f+'.h' for f in files if f != 'util') + ' goimg.h'
-        assert sys('mkdir -p', ppath(install, 'include', 'goimg')) == 0
-        assert sys('mkdir -p', ppath(install, 'lib')) == 0
-        assert sys('cp libgoimg.a', ppath(install, 'lib')) == 0
-        assert sys('cp', hfiles, ppath(install, 'include', 'goimg')) == 0
+        sys('mkdir -p', ppath(install, 'include', 'goimg'))
+        sys('mkdir -p', ppath(install, 'lib'))
+        sys('cp libgoimg.a', ppath(install, 'lib'))
+        sys('cp', hfiles, ppath(install, 'include', 'goimg'))
 
 if __name__ == '__main__':
     if len(argv) > 1 and argv[1][:2] == '-i':
