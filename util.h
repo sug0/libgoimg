@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "goio.h"
 
+#define _im_maybe_jmp_err(CHK)  if (!(CHK)) {err = -1; goto done;}
+
 #if defined(_WIN32) || defined(_WIN64)
     #include <winsock.h>
 #elif defined(__CYGWIN__) && !defined(_WIN32)

@@ -170,7 +170,62 @@ int im_jpeg_dec(Image_t *img, rfun_t rf, void *src)
 
 int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
 {
-    return -1;
+    int err = 0, color_space, components, pix_width;
+
+    struct jpeg_compress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+
+    /* determine color space */
+    if (img->color_model == im_colormodel_gray) {
+        color_space = JCS_GRAYSCALE;
+        components = 1;
+        pix_width = sizeof(uint8_t);
+    } else if (img->color_model == im_colormodel_cmyk) {
+        color_space = JCS_CMYK;
+        components = 4;
+        pix_width = sizeof(uint32_t);
+    } else {
+        /* TODO: implement other color spaces,
+         * and lossy conversion */
+        _im_maybe_jmp_err(0);
+    }
+
+    /* create write struct */
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_compress(&cinfo);
+
+    /* set dst */
+    _jpeg_goio_dest(&cinfo, wf, dst);
+
+    /* set image data */
+    cinfo.image_width = img->w;
+    cinfo.image_height = img->h;
+    cinfo.in_color_space = color_space;
+    cinfo.input_components = components;
+
+    /* setup rest with default stuff */
+    jpeg_set_defaults(&cinfo);
+
+    /* set quality to a reasonable
+     * default value */
+    jpeg_set_quality(&cinfo, 85, 1);
+
+    /* start compressing... */
+    jpeg_start_compress(&cinfo, 1);
+
+    int y;
+    JSAMPROW row, imgdata = img->img;
+
+    for (y = 0; y < img->h; y++) {
+        row = imgdata + y*img->w*pix_width;
+        jpeg_write_scanlines(&cinfo, &row, 1);
+    }
+
+done:
+    jpeg_finish_compress(&cinfo);
+    jpeg_destroy_compress(&cinfo);
+
+    return err;
 }
 
 /* -------------------------------------------------------------------------- */

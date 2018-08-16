@@ -6,8 +6,6 @@
 #include "fmt_png.h"
 #include "util.h"
 
-#define _im_maybe_jmp_err(CHK)  if (!(CHK)) {err = -1; goto done;}
-
 struct _png_state_r {
     rfun_t rf;
     void *src;
