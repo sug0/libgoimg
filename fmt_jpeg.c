@@ -175,6 +175,10 @@ int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
     struct jpeg_compress_struct cinfo;
     struct jpeg_error_mgr jerr;
 
+    /* init structs */
+    memset(&cinfo, 0, sizeof(struct jpeg_compress_struct));
+    memset(&jerr, 0, sizeof(struct jpeg_error_mgr));
+
     /* determine color space */
     if (img->color_model == im_colormodel_gray) {
         color_space = JCS_GRAYSCALE;
