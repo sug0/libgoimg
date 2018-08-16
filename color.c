@@ -7,6 +7,8 @@ inline Color_t im_newcolor_from_img(Image_t *img)
         return im_newcolor_nrgba();
     else if (img->color_model == im_colormodel_nrgba64)
         return im_newcolor_nrgba64();
+    else if (img->color_model == im_colormodel_rgb)
+        return im_newcolor_rgb();
     else if (img->color_model == im_colormodel_gray)
         return im_newcolor_gray();
     else if (img->color_model == im_colormodel_gray16)
@@ -15,6 +17,117 @@ inline Color_t im_newcolor_from_img(Image_t *img)
         return im_newcolor_cmyk();
     else
         return im_newcolor_nrgba();
+}
+
+/* -------------------------------------------------------------------------- */
+
+inline RGB_t im_decl_rgb(uint8_t r, uint8_t g, uint8_t b)
+{
+    return (RGB_t){r, g, b};
+}
+
+void im_colormodel_rgb(Color_t *dst, Color_t *src)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(RGB_t)))) {
+        if (dst->color)
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(RGB_t));
+        dst->size = sizeof(RGB_t);
+    }
+    if (unlikely(dst->c_id != GOIMG_COLOR_RGB)) {
+        dst->c_id = GOIMG_COLOR_RGB;
+        dst->rgba128 = im_rgb_convert_rgba128;
+    }
+
+    if (likely(src->c_id == GOIMG_COLOR_RGB)) {
+        *(RGB_t *)dst->color = *(RGB_t *)src->color;
+        return;
+    }
+
+    /* lossy conversion */
+    RGBA128_t c;
+    RGB_t *rgb = dst->color;
+    src->rgba128(&c, src->color);
+
+    rgb->r = GOIMG_CC(c.r);
+    rgb->g = GOIMG_CC(c.g);
+    rgb->b = GOIMG_CC(c.b);
+}
+
+void im_rgb_convert_rgba128(RGBA128_t *rgba, void *color)
+{
+    RGB_t *rgb = color;
+
+    rgba->r = rgb->r;
+    rgba->g = rgb->g;
+    rgba->b = rgb->b;
+
+    rgba->r |= rgba->r << 8;
+    rgba->g |= rgba->g << 8;
+    rgba->b |= rgba->b << 8;
+
+    rgba->a = 0xffff;
+}
+
+inline Color_t im_newcolor_rgb(void)
+{
+    return (Color_t){
+        .allocator = im_std_allocator,
+        .c_id = GOIMG_COLOR_RGB,
+        .color = im_xcalloc(im_std_allocator, 1, sizeof(RGB_t)),
+        .size = sizeof(RGB_t),
+        .rgba128 = im_rgb_convert_rgba128
+    };
+}
+
+inline Image_t im_newimg_rgb(int w, int h, Allocator_t *allocator)
+{
+    size_t size = w * h * sizeof(RGB_t);
+    allocator = allocator ? allocator : im_std_allocator;
+    return (Image_t){
+        .allocator = allocator,
+        .img = im_xalloc(allocator, size),
+        .size = size,
+        .w = w,
+        .h = h,
+        .color_model = im_colormodel_rgb,
+        .at = im_rgb_at,
+        .set = im_rgb_set
+    };
+}
+
+void im_rgb_at(Image_t *img, int x, int y, Color_t *dst)
+{
+    if (unlikely(!dst->color || (dst->color && dst->size < sizeof(RGB_t)))) {
+        if (dst->color)
+            im_xfree(dst->allocator, dst->color);
+        dst->color = im_xalloc(dst->allocator, sizeof(RGB_t));
+        dst->size = sizeof(RGB_t);
+    }
+
+    if (unlikely(dst->c_id != GOIMG_COLOR_RGB)) {
+        dst->c_id = GOIMG_COLOR_RGB;
+        dst->rgba128 = im_rgb_convert_rgba128;
+    }
+
+    *(RGB_t *)dst->color = ((RGB_t *)img->img)[y * img->w + x];
+}
+
+void im_rgb_set(Image_t *img, int x, int y, Color_t *src)
+{
+    RGB_t rgb;
+
+    if (unlikely(src->c_id != GOIMG_COLOR_RGB)) {
+        RGBA128_t c;
+        src->rgba128(&c, src->color);
+        rgb.r = GOIMG_CC(c.r);
+        rgb.g = GOIMG_CC(c.g);
+        rgb.b = GOIMG_CC(c.b);
+    } else {
+        rgb = *(RGB_t *)src->color;
+    }
+
+    ((RGB_t *)img->img)[y * img->w + x] = rgb;
 }
 
 /* -------------------------------------------------------------------------- */

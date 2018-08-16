@@ -19,12 +19,20 @@
                  (uint8_t)((Y) * 255.0), \
                  (uint8_t)((K) * 255.0)) \
 
+/* represents a RGB color with 8 bit components */
+typedef struct _s_rgb RGB_t;
+struct _s_rgb {
+    uint8_t r, g, b;
+};
+
 enum _goimg_colors {
 /* represents a non alpha premultiplied RGBA color */
     GOIMG_COLOR_NRGBA,
 /* represents a non alpha premultiplied RGBA color,
  * with each component holding 16-bits */
     GOIMG_COLOR_NRGBA64,
+/* represents a non alpha premultiplied RGB color */
+    GOIMG_COLOR_RGB,
 /* represents an 8-bit grayscale color */
     GOIMG_COLOR_GRAY,
 /* represents a 16-bit grayscale color */
@@ -38,6 +46,15 @@ enum _goimg_colors {
 /* guesses the most appropriate color to use
  * on a decoded image, based on the color model */
 extern Color_t im_newcolor_from_img(Image_t *img);
+
+/* RGB color */
+extern RGB_t im_decl_rgb(uint8_t r, uint8_t g, uint8_t b);
+extern void im_colormodel_rgb(Color_t *dst, Color_t *src);
+extern void im_rgb_convert_rgba128(RGBA128_t *rgba, void *color);
+extern Color_t im_newcolor_rgb(void);
+extern Image_t im_newimg_rgb(int w, int h, Allocator_t *allocator);
+extern void im_rgb_at(Image_t *img, int x, int y, Color_t *dst);
+extern void im_rgb_set(Image_t *img, int x, int y, Color_t *src);
 
 /* NRGBA color */
 extern uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a);

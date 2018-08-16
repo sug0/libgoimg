@@ -199,6 +199,10 @@ int im_png_enc(Image_t *img, wfun_t wf, void *dst)
         color_type = PNG_COLOR_TYPE_RGB_ALPHA;
         bit_depth = 16;
         pix_width = sizeof(uint64_t);
+    } else if (img->color_model == im_colormodel_rgb) {
+        color_type = PNG_COLOR_TYPE_RGB;
+        bit_depth = 8;
+        pix_width = sizeof(RGB_t);
     } else if (img->color_model == im_colormodel_gray) {
         color_type = PNG_COLOR_TYPE_GRAY;
         bit_depth = 8;

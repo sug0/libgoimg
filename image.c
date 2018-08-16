@@ -133,6 +133,8 @@ inline Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocat
         return im_newimg_nrgba(w, h, allocator);
     else if (color_model == im_colormodel_nrgba64)
         return im_newimg_nrgba64(w, h, allocator);
+    else if (color_model == im_colormodel_rgb)
+        return im_newimg_rgb(w, h, allocator);
     else if (color_model == im_colormodel_gray)
         return im_newimg_gray(w, h, allocator);
     else if (color_model == im_colormodel_gray16)
