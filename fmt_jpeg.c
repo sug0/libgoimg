@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <jpeglib.h>
 #include <jerror.h>
@@ -184,10 +185,20 @@ int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
         color_space = JCS_GRAYSCALE;
         components = 1;
         pix_width = sizeof(uint8_t);
+    } else if (img->color_model == im_colormodel_rgb) {
+        color_space = JCS_RGB;
+        components = 3;
+        pix_width = sizeof(RGB_t);
     } else if (img->color_model == im_colormodel_cmyk) {
         color_space = JCS_CMYK;
         components = 4;
         pix_width = sizeof(uint32_t);
+#ifdef JCS_EXTENSIONS
+    } else if (img->color_model == im_colormodel_nrgba) {
+        color_space = JCS_EXT_RGBA;
+        components = 4;
+        pix_width = sizeof(uint32_t);
+#endif
     } else {
         /* TODO: implement other color spaces,
          * and lossy conversion */
