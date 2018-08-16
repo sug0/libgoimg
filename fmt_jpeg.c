@@ -161,16 +161,9 @@ static void _jpeg_goio_dest(j_compress_ptr cinfo, wfun_t wf, void *dst)
     m_dst->dst= dst;
 }
 
-/* -------------------------------------------------------------------------- */
-
-int im_jpeg_dec(Image_t *img, rfun_t rf, void *src)
-{
-    fprintf(stderr, "decoding a jpeg file!\n");
-    return -1;
-}
-
-static void _jpeg_setup_writer(j_compress_ptr cinfo, struct jpeg_error_mgr *jerr,
-                               int w, int h,
+static void _jpeg_setup_writer(j_compress_ptr cinfo,
+                               struct jpeg_error_mgr *jerr,
+                               Image_t *img,
                                int color_space, int components, int quality,
                                wfun_t wf, void *dst)
 {
@@ -182,8 +175,8 @@ static void _jpeg_setup_writer(j_compress_ptr cinfo, struct jpeg_error_mgr *jerr
     _jpeg_goio_dest(cinfo, wf, dst);
 
     /* set image data */
-    cinfo->image_width = w;
-    cinfo->image_height = h;
+    cinfo->image_width = img->w;
+    cinfo->image_height = img->h;
     cinfo->in_color_space = color_space;
     cinfo->input_components = components;
 
@@ -192,10 +185,77 @@ static void _jpeg_setup_writer(j_compress_ptr cinfo, struct jpeg_error_mgr *jerr
 
     /* set quality to a reasonable
      * default value */
-    jpeg_set_quality(cinfo, quality, 1);
+    jpeg_set_quality(cinfo, quality, TRUE);
 
     /* start compressing... */
-    jpeg_start_compress(cinfo, 1);
+    jpeg_start_compress(cinfo, TRUE);
+}
+
+static boolean _jpeg_setup_reader(j_decompress_ptr cinfo,
+                                  struct jpeg_error_mgr *jerr,
+                                  Image_t *img,
+                                  rfun_t rf, void *src)
+{
+    /* create read struct */
+    cinfo->err = jpeg_std_error(jerr);
+    jpeg_create_decompress(cinfo);
+
+    /* set dst */
+    _jpeg_goio_src(cinfo, rf, src);
+
+    /* read header */
+    if (unlikely(jpeg_read_header(cinfo, TRUE) != JPEG_HEADER_OK))
+        return FALSE;
+
+    /* set image data */
+    img->w = cinfo->image_width;
+    img->h = cinfo->image_height;
+    img->size = img->w * img->h * sizeof(RGB_t);
+    img->img = im_xalloc(img->allocator, img->size);
+    img->color_model = im_colormodel_rgb;
+    img->at = im_rgb_at;
+    img->set = im_rgb_set;
+
+    /* set color space stuff */
+    cinfo->out_color_space = JCS_RGB;
+    cinfo->output_components = 3;
+
+    /* start decompressing... */
+    jpeg_start_decompress(cinfo);
+
+    return TRUE;
+}
+
+/* -------------------------------------------------------------------------- */
+
+int im_jpeg_dec(Image_t *img, rfun_t rf, void *src)
+{
+    int err = 0;
+
+    struct jpeg_decompress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+
+    /* init structs */
+    memset(&cinfo, 0, sizeof(struct jpeg_decompress_struct));
+    memset(&jerr, 0, sizeof(struct jpeg_error_mgr));
+
+    /* setup reader to get img width, allocate mem, etc */
+    _im_maybe_jmp_err(_jpeg_setup_reader(&cinfo, &jerr, img, rf, src));
+
+    /* read image data */
+    int y;
+    JSAMPROW row;
+
+    for (y = 0; y < img->h; y++) {
+        row = (JSAMPROW)img->img + y*img->w*sizeof(RGB_t);
+        jpeg_read_scanlines(&cinfo, &row, 1);
+    }
+
+done:
+    jpeg_finish_decompress(&cinfo);
+    jpeg_destroy_decompress(&cinfo);
+
+    return err;
 }
 
 int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
@@ -229,13 +289,13 @@ int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
     }
 
     _jpeg_setup_writer(&cinfo, &jerr,
-                       img->w, img->h, color_space, components, 85, wf, dst);
+                       img, color_space, components, 85, wf, dst);
 
     int y;
-    JSAMPROW row, imgdata = img->img;
+    JSAMPROW row;
 
     for (y = 0; y < img->h; y++) {
-        row = imgdata + y*img->w*pix_width;
+        row = (JSAMPROW)img->img + y*img->w*pix_width;
         jpeg_write_scanlines(&cinfo, &row, 1);
     }
 
@@ -243,7 +303,7 @@ int im_jpeg_enc(Image_t *img, wfun_t wf, void *dst)
 
 lossy:
     _jpeg_setup_writer(&cinfo, &jerr,
-                       img->w, img->h, JCS_RGB, 3, 85, wf, dst);
+                       img, JCS_RGB, 3, 85, wf, dst);
 
     int x;
     row = im_xalloc(im_std_allocator, sizeof(RGB_t) * img->w);
