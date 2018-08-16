@@ -42,7 +42,10 @@ def sys(*args):
     print(cmd)
     return os.system(cmd)
 
-def build():
+def ppath(prefix, *args):
+    return '%s%s%s' % (prefix, os.sep, os.sep.join(args))
+
+def build(install=None):
     files = ['goio', 'allocator', 'color', 'image', 'util', 'fmt_farbfeld']
     ccopt = '-std=c99 -pedantic -Wall -O2 ' + build_fmt_opts(files)
     outlib = 'libgoimg.a'
@@ -63,5 +66,17 @@ def build():
     for o in objs:
         os.remove(o)
 
+    # install
+    if install:
+        hfiles = ' '.join(f+'.h' for f in files if f != 'util') + ' goimg.h'
+        assert sys('mkdir -p', ppath(install, 'include', 'goimg')) == 0
+        assert sys('mkdir -p', ppath(install, 'lib')) == 0
+        assert sys('cp libgoimg.a', ppath(install, 'lib')) == 0
+        assert sys('cp', hfiles, ppath(install, 'include', 'goimg')) == 0
+
 if __name__ == '__main__':
-    build()
+    if len(argv) > 1 and argv[1][:2] == '-i':
+        argv = argv[1:]
+        build(install=argv[0][3:])
+    else:
+        build()
