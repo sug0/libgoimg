@@ -94,7 +94,7 @@ ImageFormat_t *im_decode(Image_t *img, rfun_t rf, void *src)
             break;
         }
     }
-    free(mbuf);
+    im_xfree(im_std_allocator, mbuf);
 
     return fmt;
 }

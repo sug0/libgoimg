@@ -160,7 +160,7 @@ int im_png_dec(Image_t *img, rfun_t rf, void *src)
 done:
     if (likely(info_ptr)) png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
     if (likely(png_ptr)) png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-    if (likely(row_pointers)) free(row_pointers);
+    if (likely(row_pointers)) im_xfree(im_std_allocator, row_pointers);
 
     return err;
 }
@@ -259,9 +259,9 @@ lossy:
         png_write_row(png_ptr, (png_bytep)row);
     }
 
-    free(row);
-    free(c_src.color);
-    free(c_dst.color);
+    im_xfree(im_std_allocator, row);
+    im_xfree(im_std_allocator, c_src.color);
+    im_xfree(im_std_allocator, c_dst.color);
 
 done:
     /* write final chunk */

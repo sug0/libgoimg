@@ -320,9 +320,9 @@ lossy:
         jpeg_write_scanlines(&cinfo, &row, 1);
     }
 
-    free(row);
-    free(c_src.color);
-    free(c_dst.color);
+    im_xfree(im_std_allocator, row);
+    im_xfree(im_std_allocator, c_src.color);
+    im_xfree(im_std_allocator, c_dst.color);
 
 done:
     jpeg_finish_compress(&cinfo);
