@@ -65,8 +65,7 @@ def build(install=None):
     sys('ranlib', outlib)
 
     # cleanup .o files
-    for o in objs:
-        os.remove(o)
+    sys('rm -f *.o')
 
     # install
     if install:
