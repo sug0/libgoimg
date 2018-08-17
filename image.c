@@ -5,8 +5,10 @@
 #include "util.h"
 #include "allocator.h"
 
-/* this format is compiled by default */
+/* compile with farbfeld support */
+#ifdef GOIMG_COMPILE_FMT_FARBFELD
 #include "fmt_farbfeld.h"
+#endif
 
 /* compile with png support -- use libpng */
 #ifdef GOIMG_COMPILE_FMT_PNG
@@ -27,7 +29,9 @@ static int _img_format_i = 0;
 
 inline void im_load_defaults(void)
 {
+#ifdef GOIMG_COMPILE_FMT_FARBFELD
     im_register_format_farbfeld();
+#endif
 #ifdef GOIMG_COMPILE_FMT_PNG
     im_register_format_png();
 #endif

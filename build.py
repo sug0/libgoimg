@@ -48,7 +48,7 @@ def ppath(prefix, *args):
     return '%s%s%s' % (prefix, os.sep, os.sep.join(args))
 
 def build(install=None):
-    files = ['goio', 'allocator', 'color', 'image', 'util', 'fmt_farbfeld']
+    files = ['goio', 'allocator', 'color', 'image', 'util']
     ccopt = '-std=c99 -pedantic -Wall -O2 ' + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
