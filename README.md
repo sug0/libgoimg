@@ -124,7 +124,7 @@ int main(void)
     struct mem mem;
     Allocator_t allocator = {
         .alloc = mem_alloc,
-        .realloc = NULL,
+        .realloc = mem_realloc,
         .free = mem_free,
         .data = &mem
     };
