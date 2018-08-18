@@ -90,11 +90,9 @@ done:
 #include <string.h>
 #include <sys/mman.h>
 
-#include <goio.h>
-#include "image.h"
-#include "color.h"
+#include <goimg/goimg.h>
 
-#define DIM  5000
+#define DIM  100
 #define M    ((DIM)/2)
 
 #define NO_ADDR  8
@@ -131,12 +129,16 @@ int main(void)
         .data = &mem
     };
 
+    /* load default image formats */
+    im_load_defaults();
+
     /* zero out allocator memory */
     memset(&mem, 0, sizeof(struct mem));
 
     Color_t c = im_newcolor_gray();
     Image_t img = im_newimg_gray(DIM, DIM, &allocator);
 
+    /* draw pixel data */
     for (y = 0; y < DIM; y++) {
         for (x = 0; x < DIM; x++) {
             *(uint8_t *)c.color = get_color(x, y);
@@ -144,9 +146,12 @@ int main(void)
         }
     }
 
+    /* encode to stdout as PNG */
     if (im_encode(&img, "PNG", fdwrite, GOIO_FD(1)) < 0)
         err = 1;
 
+    /* free memory using the respective allocators,
+     * for 'img' and 'c' */
     im_xfree(im_std_allocator, c.color);
     im_xfree(&allocator, img.img);
 
