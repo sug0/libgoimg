@@ -18,19 +18,19 @@ later two requiring `libpng` and `libjpeg(-turbo)` respectively.
 This library comes with a simple python build script I wrote. The syntax for the
 command line arguments it accepts is:
 
-`python build.py [-i:INSTALL_PATH_PREFIX] [FMT_1+FMT_2+...]`
+    $ python build.py [-i:INSTALL_PATH_PREFIX] [FMT_1+FMT_2+...]
 
 To build with support for all formats do:
 
-`python build.py png+jpeg+farbfeld`
+    $ python build.py png+jpeg+farbfeld
 
 To install it after building:
 
-`sudo python build.py -i:/usr/local png+jpeg+farbfeld`
+    $ sudo python build.py -i:/usr/local png+jpeg+farbfeld
 
 To build with none of these formats:
 
-`python build.py`
+    $ python build.py
 
 # Linking against this library
 
