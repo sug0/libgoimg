@@ -102,12 +102,14 @@ done:
 #define COLOR_WHITE  255
 #define COLOR_BLACK  0
 
+struct mem_addr {
+    void *addr;
+    FILE *fp;
+    size_t size;
+};
+
 struct mem {
-    struct {
-        void *addr;
-        FILE *fp;
-        size_t size;
-    } addrs[NO_ADDR];
+    struct mem_addr addrs[NO_ADDR];
 };
 
 int sq(int x);
