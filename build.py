@@ -69,7 +69,7 @@ def build(install=None):
 
     # install
     if install:
-        hfiles = ' '.join(f+'.h' for f in files if f != 'util') + ' goimg.h'
+        hfiles = ' '.join(f+'.h' for f in files if f != 'util' and f[:4] != 'fmt_') + ' goimg.h'
         sys('mkdir -p', ppath(install, 'include', 'goimg'))
         sys('mkdir -p', ppath(install, 'lib'))
         sys('cp libgoimg.a', ppath(install, 'lib'))
