@@ -101,7 +101,9 @@ extern Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocat
 extern void im_cpy(Image_t *dst, Image_t *src);
 
 /* returns a pointer to an image format 'fmt',
- * or NULL, if no such format is registered */
+ * or NULL, if no such format is registered; the
+ * returned pointer references static memory,
+ * so it should not be attempted to be free'd */
 extern ImageFormat_t *im_get_format(char *fmt);
 
 /* load the compiled formats -- this

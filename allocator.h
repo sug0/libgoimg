@@ -13,7 +13,11 @@ struct _s_allocator {
     void *data;
 };
 
-/* the standard heap allocator */
+/* the standard heap allocator; you may replace
+ * this with whatever you want by attributing
+ * a new value to this var before any function
+ * call that allocates memory; optionally you
+ * can hack 'allocator.c' to your needs */
 extern Allocator_t *im_std_allocator;
 
 /* these methods are wrappers for the allocator
