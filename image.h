@@ -96,6 +96,9 @@ extern int im_encode(Image_t *img, char *fmt, wfun_t wf, void *dst);
 /* allocates and returns a new image with the given params */
 extern Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocator);
 
+/* allocates and inits a new image with the given params */
+extern void im_initimg(Image_t *img, int w, int h, cmfun_t color_model, Allocator_t *allocator);
+
 /* allocate an exact copy of 'src' using the
  * allocator of 'dst'*/
 extern void im_cpy(Image_t *dst, Image_t *src);

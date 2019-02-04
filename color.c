@@ -80,20 +80,24 @@ inline Color_t im_newcolor_rgb(void)
     };
 }
 
-inline Image_t im_newimg_rgb(int w, int h, Allocator_t *allocator)
+inline void im_initimg_rgb(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(RGB_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_rgb,
-        .at = im_rgb_at,
-        .set = im_rgb_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_rgb;
+    img->at = im_rgb_at;
+    img->set = im_rgb_set;
+}
+
+inline Image_t im_newimg_rgb(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_rgb(&img, w, h, allocator);
+    return img;
 }
 
 void im_rgb_at(Image_t *img, int x, int y, Color_t *dst)
@@ -196,20 +200,24 @@ inline Color_t im_newcolor_nrgba(void)
     };
 }
 
-inline Image_t im_newimg_nrgba(int w, int h, Allocator_t *allocator)
+inline void im_initimg_nrgba(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_nrgba,
-        .at = im_nrgba_at,
-        .set = im_nrgba_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_nrgba;
+    img->at = im_nrgba_at;
+    img->set = im_nrgba_set;
+}
+
+inline Image_t im_newimg_nrgba(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_nrgba(&img, w, h, allocator);
+    return img;
 }
 
 void im_nrgba_at(Image_t *img, int x, int y, Color_t *dst)
@@ -306,20 +314,24 @@ inline Color_t im_newcolor_nrgba64(void)
     };
 }
 
-inline Image_t im_newimg_nrgba64(int w, int h, Allocator_t *allocator)
+inline void im_initimg_nrgba64(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint64_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_nrgba64,
-        .at = im_nrgba64_at,
-        .set = im_nrgba64_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_nrgba64;
+    img->at = im_nrgba64_at;
+    img->set = im_nrgba64_set;
+}
+
+inline Image_t im_newimg_nrgba64(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_nrgba64(&img, w, h, allocator);
+    return img;
 }
 
 void im_nrgba64_at(Image_t *img, int x, int y, Color_t *dst)
@@ -408,20 +420,24 @@ inline Color_t im_newcolor_gray(void)
     };
 }
 
-inline Image_t im_newimg_gray(int w, int h, Allocator_t *allocator)
+inline void im_initimg_gray(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint8_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_gray,
-        .at = im_gray_at,
-        .set = im_gray_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_gray;
+    img->at = im_gray_at;
+    img->set = im_gray_set;
+}
+
+inline Image_t im_newimg_gray(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_gray(&img, w, h, allocator);
+    return img;
 }
 
 void im_gray_at(Image_t *img, int x, int y, Color_t *dst)
@@ -504,20 +520,24 @@ inline Color_t im_newcolor_gray16(void)
     };
 }
 
-inline Image_t im_newimg_gray16(int w, int h, Allocator_t *allocator)
+inline void im_initimg_gray16(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint16_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_gray16,
-        .at = im_gray16_at,
-        .set = im_gray16_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_gray16;
+    img->at = im_gray16_at;
+    img->set = im_gray16_set;
+}
+
+inline Image_t im_newimg_gray16(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_gray16(&img, w, h, allocator);
+    return img;
 }
 
 void im_gray16_at(Image_t *img, int x, int y, Color_t *dst)
@@ -627,20 +647,24 @@ inline Color_t im_newcolor_cmyk(void)
     };
 }
 
-inline Image_t im_newimg_cmyk(int w, int h, Allocator_t *allocator)
+inline void im_initimg_cmyk(Image_t *img, int w, int h, Allocator_t *allocator)
 {
     size_t size = w * h * sizeof(uint32_t);
-    allocator = allocator ? allocator : im_std_allocator;
-    return (Image_t){
-        .allocator = allocator,
-        .img = im_xalloc(allocator, size),
-        .size = size,
-        .w = w,
-        .h = h,
-        .color_model = im_colormodel_cmyk,
-        .at = im_cmyk_at,
-        .set = im_cmyk_set
-    };
+    img->allocator = allocator ? allocator : im_std_allocator;
+    img->img = im_xalloc(allocator, size);
+    img->size = size;
+    img->w = w;
+    img->h = h;
+    img->color_model = im_colormodel_cmyk;
+    img->at = im_cmyk_at;
+    img->set = im_cmyk_set;
+}
+
+inline Image_t im_newimg_cmyk(int w, int h, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg_cmyk(&img, w, h, allocator);
+    return img;
 }
 
 void im_cmyk_at(Image_t *img, int x, int y, Color_t *dst)

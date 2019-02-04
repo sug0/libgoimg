@@ -131,20 +131,27 @@ inline void im_cpy(Image_t *dst, Image_t *src)
     dst->set = src->set;
 }
 
-inline Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocator)
+inline void im_initimg(Image_t *img, int w, int h, cmfun_t color_model, Allocator_t *allocator)
 {
     if (color_model == im_colormodel_nrgba)
-        return im_newimg_nrgba(w, h, allocator);
+        im_initimg_nrgba(img, w, h, allocator);
     else if (color_model == im_colormodel_nrgba64)
-        return im_newimg_nrgba64(w, h, allocator);
+        im_initimg_nrgba64(img, w, h, allocator);
     else if (color_model == im_colormodel_rgb)
-        return im_newimg_rgb(w, h, allocator);
+        im_initimg_rgb(img, w, h, allocator);
     else if (color_model == im_colormodel_gray)
-        return im_newimg_gray(w, h, allocator);
+        im_initimg_gray(img, w, h, allocator);
     else if (color_model == im_colormodel_gray16)
-        return im_newimg_gray16(w, h, allocator);
+        im_initimg_gray16(img, w, h, allocator);
     else if (color_model == im_colormodel_cmyk)
-        return im_newimg_cmyk(w, h, allocator);
+        im_initimg_cmyk(img, w, h, allocator);
     else
-        return im_newimg_nrgba(w, h, allocator);
+        im_initimg_nrgba(img, w, h, allocator);
+}
+
+inline Image_t im_newimg(int w, int h, cmfun_t color_model, Allocator_t *allocator)
+{
+    Image_t img;
+    im_initimg(&img, w, h, color_model, allocator);
+    return img;
 }
