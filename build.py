@@ -51,10 +51,10 @@ def ppath(prefix, *args):
 
 def raspberry_pi_opts():
     try:
-        with open('/proc/device-tree', 'r') as f:
+        with open('/proc/device-tree/model', 'r') as f:
             model = f.read()
             if model.find('Raspberry Pi 3') != -1:
-                return '-mcpu=cortex-a53 -mfloat-abi=hard -mfpu=neon-fp-armv8 -mneon-for-64bits '
+                return '-mcpu=cortex-a53 -mtune=cortex-a53 '
             elif model.find('Raspberry Pi 2') != -1:
                 return '-mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
             elif model.find('Raspberry Pi ') != -1:
@@ -85,7 +85,7 @@ def build(install=None):
     os.chdir('src')
 
     files = ['goio', 'allocator', 'color', 'image', 'util']
-    ccopt = '-std=c99 -pedantic -Wall -O2 ' + optimized() + build_fmt_opts(files)
+    ccopt = '-std=c99 -pedantic -Wall -O3 ' + optimized() + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
     objs = [f+'.o' for f in files]
