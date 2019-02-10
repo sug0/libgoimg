@@ -1,6 +1,8 @@
 import os
 
 from sys import exit, argv
+from platform import machine
+from functools import reduce
 
 def is_exe(fpath):
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -47,12 +49,43 @@ def sys(*args):
 def ppath(prefix, *args):
     return '%s%s%s' % (prefix, os.sep, os.sep.join(args))
 
+def raspberry_pi_opts():
+    try:
+        with open('/proc/device-tree', 'r') as f:
+            model = f.read()
+            if model.find('Raspberry Pi 3') != -1:
+                return '-mcpu=cortex-a53 -mfloat-abi=hard -mfpu=neon-fp-armv8 -mneon-for-64bits '
+            elif model.find('Raspberry Pi 2') != -1:
+                return '-mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
+            elif model.find('Raspberry Pi ') != -1:
+                return '-mcpu=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp '
+            else:
+                return ''
+    except FileNotFoundError:
+        return ''
+
+# https://stackoverflow.com/questions/661338/sse-sse2-and-sse3-for-gnu-c/662250
+# https://gist.github.com/fm4dd/c663217935dc17f0fc73c9c81b0aa845
+# https://en.wikipedia.org/wiki/Uname
+def optimized():
+    m = machine()
+    either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, args))
+
+    opts_intel = '-msse -msse2 -msse3 -mfpmath=sse '
+
+    if either('aarch64', 'armv7l', 'armv6l'):
+        return raspberry_pi_opts()
+    elif either('i686', 'i386', 'x86', 'x86_64', 'amd64'):
+        return opts_intel
+    else:
+        return ''
+
 def build(install=None):
     # change to source dir
     os.chdir('src')
 
     files = ['goio', 'allocator', 'color', 'image', 'util']
-    ccopt = '-std=c99 -pedantic -Wall -O2 ' + build_fmt_opts(files)
+    ccopt = '-std=c99 -pedantic -Wall -O2 ' + optimized() + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
     objs = [f+'.o' for f in files]
