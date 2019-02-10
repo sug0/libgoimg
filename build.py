@@ -68,8 +68,8 @@ def raspberry_pi_opts():
 # https://gist.github.com/fm4dd/c663217935dc17f0fc73c9c81b0aa845
 # https://en.wikipedia.org/wiki/Uname
 def optimized():
-    m = machine()
-    either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, args))
+    m = machine().upper()
+    either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, map(str.upper, args)))
 
     opts_intel = '-msse -msse2 -msse3 -mfpmath=sse '
 
