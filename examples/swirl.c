@@ -1,8 +1,6 @@
 #include <math.h>
 #include <goimg/goimg.h>
 
-#define vu32(V, I)  (((uint32_t *)(V))[I])
-
 static void im_swirl(Image_t *dst, Image_t *const src, double amt, double size);
 
 int main(void)
