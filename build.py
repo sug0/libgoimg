@@ -1,3 +1,4 @@
+import re
 import os
 
 from sys import exit, argv
@@ -64,6 +65,26 @@ def raspberry_pi_opts():
     except FileNotFoundError:
         return ''
 
+def x86_opts():
+    try:
+        f = open('/proc/cpuinfo', 'r')
+        line = f.readline()
+        while line:
+            if line.find('flags') == 0:
+                break
+            line = f.readline()
+        f.close()
+        if not line:
+            return
+        for opt in [r'mmx\s', r'avx\s', r'avx2\s', r'sse\s', r'sse2\s', r'sse3\s', r'ssse3\s', r'sse4\s']:
+            if re.search(opt, line) != None:
+                yield '-m'+opt[:-2]
+                if opt == r'sse\s':
+                    yield '-mfpmath=sse'
+    except FileNotFoundError:
+        return
+
+# https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html
 # https://stackoverflow.com/questions/661338/sse-sse2-and-sse3-for-gnu-c/662250
 # https://gist.github.com/fm4dd/c663217935dc17f0fc73c9c81b0aa845
 # https://en.wikipedia.org/wiki/Uname
@@ -71,12 +92,10 @@ def optimized():
     m = machine().upper()
     either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, map(str.upper, args)))
 
-    opts_intel = '-mmmx -mavx -mavx2 -msse -msse2 -msse3 -mfpmath=sse '
-
     if either('aarch64', 'armv7l', 'armv6l'):
         return raspberry_pi_opts()
     elif either('i686', 'i386', 'x86', 'x86_64', 'amd64'):
-        return opts_intel
+        return ' '.join(x86_opts()) + ' '
     else:
         return ''
 
