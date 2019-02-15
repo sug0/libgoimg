@@ -77,13 +77,13 @@ def x86_opts():
         if not line:
             return
         opts = [
-            r'mmx\s'
-            r'avx\s'
-            r'avx2\s'
-            r'sse\s'
-            r'sse2\s'
-            r'sse3\s'
-            r'ssse3\s'
+            r'mmx\s',
+            r'avx\s',
+            r'avx2\s',
+            r'sse\s',
+            r'sse2\s',
+            r'sse3\s',
+            r'ssse3\s',
             r'sse4\s',
             r'sse4a\s',
             r'sse4_1\s',
