@@ -71,7 +71,7 @@ def optimized():
     m = machine().upper()
     either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, map(str.upper, args)))
 
-    opts_intel = '-msse -msse2 -msse3 -mfpmath=sse '
+    opts_intel = '-mmmx -mavx -mavx2 -msse -msse2 -msse3 -mfpmath=sse '
 
     if either('aarch64', 'armv7l', 'armv6l'):
         return raspberry_pi_opts()
