@@ -76,9 +76,22 @@ def x86_opts():
         f.close()
         if not line:
             return
-        for opt in [r'mmx\s', r'avx\s', r'avx2\s', r'sse\s', r'sse2\s', r'sse3\s', r'ssse3\s', r'sse4\s']:
+        opts = [
+            r'mmx\s'
+            r'avx\s'
+            r'avx2\s'
+            r'sse\s'
+            r'sse2\s'
+            r'sse3\s'
+            r'ssse3\s'
+            r'sse4\s',
+            r'sse4a\s',
+            r'sse4_1\s',
+            r'sse4_2\s',
+        ]
+        for opt in opts:
             if re.search(opt, line) != None:
-                yield '-m'+opt[:-2]
+                yield '-m'+opt[:-2].replace('_', '.')
                 if opt == r'sse\s':
                     yield '-mfpmath=sse'
     except FileNotFoundError:
