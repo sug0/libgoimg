@@ -11,7 +11,7 @@
 #ifdef _WIN32
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
-#   define GET_PROCS()  {SYSTEM_INFO i; GetSystemInfo(&i); i.dwNumberOfProcessors;}
+#   define GET_PROCS()  ({SYSTEM_INFO i; GetSystemInfo(&i); i.dwNumberOfProcessors;})
 #else
 #   include <sys/sysinfo.h>
 #   define GET_PROCS()  get_nprocs()
