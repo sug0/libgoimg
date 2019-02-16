@@ -9,7 +9,9 @@
  * */
 
 #ifdef _WIN32
-#   define GET_PROCS()  4
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#   define GET_PROCS()  {SYSTEM_INFO i; GetSystemInfo(&i); i.dwNumberOfProcessors;}
 #else
 #   include <sys/sysinfo.h>
 #   define GET_PROCS()  get_nprocs()
@@ -108,10 +110,43 @@ void worker(void *args)
     im_xfree(im_std_allocator, args);
 }
 
+inline void im_distort_singlecore(Image_t *dst, Image_t *const src)
+{
+    int x, y, u, v;
+
+    const int cx = src->w/2;
+    const int cy = src->h/2;
+
+    Color_t c_src = im_newcolor_from_img(src),
+            c_dst = im_newcolor_nrgba64();
+
+    im_initimg_nrgba64(dst, src->w, src->h, im_std_allocator);
+
+    for (y = 0; y < src->h; y++) {
+        for (x = 0; x < src->w; x++) {
+            distort(&u, &v, x, y, cx, cy);
+            clamp(&u, &v, src->w, src->h);
+            src->at(src, u, v, &c_src);
+            im_colormodel_nrgba64(&c_dst, &c_src);
+            dst->set(dst, x, y, &c_dst);
+        }
+    }
+
+    im_xfree(im_std_allocator, c_src.color);
+    im_xfree(im_std_allocator, c_dst.color);
+}
+
 void im_distort(Image_t *dst, Image_t *const src)
 {
+    const int nprocs = GET_PROCS();
+
+    if (nprocs == 1) {
+        im_distort_singlecore(dst, src);
+        return;
+    }
+
     int y;
-    threadpool pool = thpool_init(get_nprocs());
+    threadpool pool = thpool_init(nprocs);
 
     im_initimg_nrgba64(dst, src->w, src->h, im_std_allocator);
 
