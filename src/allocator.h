@@ -21,11 +21,17 @@ struct _s_allocator {
 extern Allocator_t *im_std_allocator;
 
 /* these methods are wrappers for the allocator
- * object, that abort execution when no memory is
- * available to be allocated */
+ * object, that abort execution with im_abort()
+ * when no memory is available to be allocated */
 extern void *im_xalloc(Allocator_t *allocator, size_t size);
 extern void *im_xcalloc(Allocator_t *allocator, size_t nmemb, size_t size);
 extern void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size);
 extern void im_xfree(Allocator_t *allocator, void *ptr);
+
+/* the routine that is called when the memory allocation
+ * routines fail; execution should abort; this variable
+ * can be set to whatever you feel is suitable for the task
+ * at hand */
+extern void (*im_abort)(void);
 
 #endif
