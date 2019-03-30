@@ -96,8 +96,8 @@ int im_farbfeld_enc(Image_t *img, wfun_t wf, void *dst)
     }
 
 done:
-    free(c_src.color);
-    free(c_dst.color);
+    im_xfree(im_std_allocator, c_src.color);
+    im_xfree(im_std_allocator, c_dst.color);
 
     return err;
 }
