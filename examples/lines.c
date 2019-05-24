@@ -1,8 +1,8 @@
-#include <math.h>
 #include <string.h>
 #include <goimg/goimg.h>
 
-#define DIM  6000
+#define DIM 1900
+#define SQ  1500
 
 struct data {
     Image_t img;
@@ -79,26 +79,26 @@ inline void line(int x0, int y0, int x1, int y1)
         else
             line_lo(x0, y0, x1, y1);
     } else {
-        if (x0 > x1)
+        if (y0 > y1)
             line_hi(x1, y1, x0, y0);
         else
             line_hi(x0, y0, x1, y1);
     }
 }
 
-void draw(double q, int x0, int y0, int x1, int y1)
+void triangle(int t, int x0, int y0, int x1, int y1, int x2, int y2)
 {
-    double angle = 0.0, c, s;
-    const double step = M_PI/q;
+    if (t <= 0) return;
 
-    while (angle < 2*M_PI) {
-        line(x0, y0, x1, y1);
-        c = cos(angle);
-        s = sin(angle);
-        x1 = (int)(c*(double)x1 - s*(double)y1);
-        y1 = (int)(s*(double)x1 + c*(double)y1);
-        angle += step;
-    }
+    line(x0,y0, x1,y1);
+    line(x1,y1, x2,y2);
+    line(x2,y2, x0,y0);
+
+    x0 += 2; y0 += 2;
+    x1 += 2; y1 += 2;
+    x2 += 2; y2 += 2;
+
+    triangle(t-1, x0,y0, x1,y1, x2,y2);
 }
 
 int main(void)
@@ -106,7 +106,7 @@ int main(void)
     int err = 0;
 
     struct data d = {
-        .img = {.img = NULL, .allocator = im_std_allocator},
+        .img = {.allocator = im_std_allocator},
         .col = im_newcolor_nrgba(),
     };
     dd = &d;
@@ -121,7 +121,7 @@ int main(void)
     *(uint32_t *)d.col.color = im_decl_nrgba(0, 0, 0, 255);
 
     /* draw image */
-    draw((float)(DIM << 1), DIM/2, DIM/2, DIM-1, DIM/2, &d);
+    triangle(200, 10,SQ-11, SQ-11,SQ-11, (SQ/2)-11, 10);
 
     if (im_encode(&d.img, "PNG", fdwrite, GOIO_FD(1)) < 0)
         err = 1;
