@@ -1,3 +1,7 @@
+<p align="center">
+   <img src="res/logo.png" width=350>
+</p>
+
 # libgoimg
 
 A C library that aims to provide the ease of operation Go enables for image processing.
