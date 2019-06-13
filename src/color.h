@@ -45,6 +45,7 @@ enum _goimg_colors {
 
 /* guesses the most appropriate color to use
  * on a decoded image, based on the color model */
+extern void im_initcolor_from_img(Image_t *img, Color_t *col);
 extern Color_t im_newcolor_from_img(Image_t *img);
 
 /* images are constructed with im_initimg_*, or im_newimg_*,
@@ -63,6 +64,7 @@ extern Color_t im_newcolor_from_img(Image_t *img);
 extern RGB_t im_decl_rgb(uint8_t r, uint8_t g, uint8_t b);
 extern void im_colormodel_rgb(Color_t *dst, Color_t *src);
 extern void im_rgb_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_rgb(Color_t *col);
 extern Color_t im_newcolor_rgb(void);
 extern void im_initimg_rgb(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_rgb(int w, int h, Allocator_t *allocator);
@@ -73,6 +75,7 @@ extern void im_rgb_set(Image_t *img, int x, int y, Color_t *src);
 extern uint32_t im_decl_nrgba(uint32_t r, uint32_t g, uint32_t b, uint32_t a);
 extern void im_colormodel_nrgba(Color_t *dst, Color_t *src);
 extern void im_nrgba_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_nrgba(Color_t *col);
 extern Color_t im_newcolor_nrgba(void);
 extern void im_initimg_nrgba(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_nrgba(int w, int h, Allocator_t *allocator);
@@ -83,6 +86,7 @@ extern void im_nrgba_set(Image_t *img, int x, int y, Color_t *src);
 extern uint64_t im_decl_nrgba64(uint64_t r, uint64_t g, uint64_t b, uint64_t a);
 extern void im_colormodel_nrgba64(Color_t *dst, Color_t *src);
 extern void im_nrgba64_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_nrgba64(Color_t *col);
 extern Color_t im_newcolor_nrgba64(void);
 extern void im_initimg_nrgba64(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_nrgba64(int w, int h, Allocator_t *allocator);
@@ -92,6 +96,7 @@ extern void im_nrgba64_set(Image_t *img, int x, int y, Color_t *src);
 /* gray color */
 extern void im_colormodel_gray(Color_t *dst, Color_t *src);
 extern void im_gray_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_gray(Color_t *col);
 extern Color_t im_newcolor_gray(void);
 extern void im_initimg_gray(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_gray(int w, int h, Allocator_t *allocator);
@@ -101,6 +106,7 @@ extern void im_gray_set(Image_t *img, int x, int y, Color_t *src);
 /* gray16 color */
 extern void im_colormodel_gray16(Color_t *dst, Color_t *src);
 extern void im_gray16_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_gray16(Color_t *col);
 extern Color_t im_newcolor_gray16(void);
 extern void im_initimg_gray16(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_gray16(int w, int h, Allocator_t *allocator);
@@ -111,6 +117,7 @@ extern void im_gray16_set(Image_t *img, int x, int y, Color_t *src);
 extern uint32_t im_decl_cmyk(uint32_t c, uint32_t m, uint32_t y, uint32_t k);
 extern void im_colormodel_cmyk(Color_t *dst, Color_t *src);
 extern void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color);
+extern void im_initcolor_cmyk(Color_t *col);
 extern Color_t im_newcolor_cmyk(void);
 extern void im_initimg_cmyk(Image_t *img, int w, int h, Allocator_t *allocator);
 extern Image_t im_newimg_cmyk(int w, int h, Allocator_t *allocator);

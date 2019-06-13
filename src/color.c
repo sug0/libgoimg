@@ -1,22 +1,29 @@
 #include "color.h"
 #include "util.h"
 
-inline Color_t im_newcolor_from_img(Image_t *img)
+inline void im_initcolor_from_img(Image_t *img, Color_t *col)
 {
     if (img->color_model == im_colormodel_nrgba)
-        return im_newcolor_nrgba();
+        im_initcolor_nrgba(col);
     else if (img->color_model == im_colormodel_nrgba64)
-        return im_newcolor_nrgba64();
+        im_initcolor_nrgba64(col);
     else if (img->color_model == im_colormodel_rgb)
-        return im_newcolor_rgb();
+        im_initcolor_rgb(col);
     else if (img->color_model == im_colormodel_gray)
-        return im_newcolor_gray();
+        im_initcolor_gray(col);
     else if (img->color_model == im_colormodel_gray16)
-        return im_newcolor_gray16();
+        im_initcolor_gray16(col);
     else if (img->color_model == im_colormodel_cmyk)
-        return im_newcolor_cmyk();
+        im_initcolor_cmyk(col);
     else
-        return im_newcolor_nrgba();
+        im_initcolor_nrgba(col);
+}
+
+inline Color_t im_newcolor_from_img(Image_t *img)
+{
+    Color_t col;
+    im_initcolor_from_img(img, &col);
+    return col;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -69,15 +76,20 @@ void im_rgb_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->a = 0xffff;
 }
 
+inline void im_initcolor_rgb(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_RGB;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(RGB_t));
+    col->size = sizeof(RGB_t);
+    col->rgba128 = im_rgb_convert_rgba128;
+}
+
 inline Color_t im_newcolor_rgb(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_RGB,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(RGB_t)),
-        .size = sizeof(RGB_t),
-        .rgba128 = im_rgb_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_rgb(&col);
+    return col;
 }
 
 inline void im_initimg_rgb(Image_t *img, int w, int h, Allocator_t *allocator)
@@ -189,15 +201,20 @@ void im_nrgba_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->a |= rgba->a << 8;
 }
 
+inline void im_initcolor_nrgba(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_NRGBA;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t));
+    col->size = sizeof(uint32_t);
+    col->rgba128 = im_nrgba_convert_rgba128;
+}
+
 inline Color_t im_newcolor_nrgba(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_NRGBA,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t)),
-        .size = sizeof(uint32_t),
-        .rgba128 = im_nrgba_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_nrgba(&col);
+    return col;
 }
 
 inline void im_initimg_nrgba(Image_t *img, int w, int h, Allocator_t *allocator)
@@ -303,15 +320,20 @@ void im_nrgba64_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->b /= 0xffff;
 }
 
+inline void im_initcolor_nrgba64(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_NRGBA64;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(uint64_t));
+    col->size = sizeof(uint64_t);
+    col->rgba128 = im_nrgba64_convert_rgba128;
+}
+
 inline Color_t im_newcolor_nrgba64(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_NRGBA64,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint64_t)),
-        .size = sizeof(uint64_t),
-        .rgba128 = im_nrgba64_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_nrgba64(&col);
+    return col;
 }
 
 inline void im_initimg_nrgba64(Image_t *img, int w, int h, Allocator_t *allocator)
@@ -409,15 +431,20 @@ void im_gray_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->a = 0xffff;
 }
 
+inline void im_initcolor_gray(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_GRAY;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(uint8_t));
+    col->size = sizeof(uint8_t);
+    col->rgba128 = im_gray_convert_rgba128;
+}
+
 inline Color_t im_newcolor_gray(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_GRAY,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint8_t)),
-        .size = sizeof(uint8_t),
-        .rgba128 = im_gray_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_gray(&col);
+    return col;
 }
 
 inline void im_initimg_gray(Image_t *img, int w, int h, Allocator_t *allocator)
@@ -509,15 +536,20 @@ void im_gray16_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->a = 0xffff;
 }
 
+inline void im_initcolor_gray16(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_GRAY16;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(uint16_t));
+    col->size = sizeof(uint16_t);
+    col->rgba128 = im_gray16_convert_rgba128;
+}
+
 inline Color_t im_newcolor_gray16(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_GRAY16,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint16_t)),
-        .size = sizeof(uint16_t),
-        .rgba128 = im_gray16_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_gray16(&col);
+    return col;
 }
 
 inline void im_initimg_gray16(Image_t *img, int w, int h, Allocator_t *allocator)
@@ -636,15 +668,20 @@ void im_cmyk_convert_rgba128(RGBA128_t *rgba, void *color)
     rgba->a = 0xffff;
 }
 
+inline void im_initcolor_cmyk(Color_t *col)
+{
+    col->allocator = im_std_allocator;
+    col->c_id = GOIMG_COLOR_CMYK;
+    col->color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t));
+    col->size = sizeof(uint32_t);
+    col->rgba128 = im_cmyk_convert_rgba128;
+}
+
 inline Color_t im_newcolor_cmyk(void)
 {
-    return (Color_t){
-        .allocator = im_std_allocator,
-        .c_id = GOIMG_COLOR_CMYK,
-        .color = im_xcalloc(im_std_allocator, 1, sizeof(uint32_t)),
-        .size = sizeof(uint32_t),
-        .rgba128 = im_cmyk_convert_rgba128
-    };
+    Color_t col;
+    im_initcolor_cmyk(&col);
+    return col;
 }
 
 inline void im_initimg_cmyk(Image_t *img, int w, int h, Allocator_t *allocator)
