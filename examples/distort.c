@@ -110,7 +110,7 @@ void worker(void *args)
     im_xfree(im_std_allocator, args);
 }
 
-inline void im_distort_singlecore(Image_t *dst, Image_t *const src)
+void im_distort_singlecore(Image_t *dst, Image_t *const src)
 {
     int x, y, u, v;
 
