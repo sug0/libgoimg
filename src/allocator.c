@@ -39,17 +39,26 @@ void (*im_abort)(void) = _im_abort;
 
 /* -------------------------------------------------------------------------- */
 
-void *im_xalloc(Allocator_t *allocator, size_t size)
+inline void *im_xalloc(Allocator_t *allocator, size_t size)
 {
+    if (unlikely(!allocator->realloc))
+        size += sizeof(size_t);
+
     void *m = allocator->alloc(allocator->data, size);
 
     if (unlikely(!m))
         im_abort();
 
+    /* save size as fallback when no realloc exists */
+    if (unlikely(!allocator->realloc)) {
+        *(size_t *)m = size - sizeof(size_t);
+        m = (intptr_t *)m + sizeof(size_t);
+    }
+
     return m;
 }
 
-void *im_xcalloc(Allocator_t *allocator, size_t nmemb, size_t size)
+inline void *im_xcalloc(Allocator_t *allocator, size_t nmemb, size_t size)
 {
     void *m;
     size *= nmemb;
@@ -58,8 +67,17 @@ void *im_xcalloc(Allocator_t *allocator, size_t nmemb, size_t size)
     return m;
 }
 
-void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
+inline void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
 {
+    /* fallback */
+    if (unlikely(!allocator->realloc)) {
+        const size_t old_size = *(size_t *)((intptr_t *)ptr - sizeof(size_t));
+        void *new_ptr = im_xalloc(allocator, size);
+        memcpy(new_ptr, ptr, old_size);
+        im_xfree(allocator, ptr);
+        return new_ptr;
+    }
+
     void *m = allocator->realloc(allocator->data, ptr, size);
 
     if (unlikely(!m))
@@ -70,6 +88,9 @@ void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
 
 inline void im_xfree(Allocator_t *allocator, void *ptr)
 {
-    if (likely(ptr))
+    if (likely(ptr)) {
+        if (unlikely(!allocator->realloc))
+            ptr = (intptr_t *)ptr - sizeof(size_t);
         allocator->free(allocator->data, ptr);
+    }
 }
