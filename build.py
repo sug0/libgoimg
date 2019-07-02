@@ -23,7 +23,7 @@ def which(program):
                 return exe_file
 
 def find_cc():
-    return which('cc') or which('gcc') or which('clang')
+    return os.getenv('CC') or which('cc') or which('gcc') or which('clang')
 
 def transform_fmt(fmt):
     return '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
