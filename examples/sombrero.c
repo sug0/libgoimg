@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <goimg/goimg.h>
 
-/* blur stuff */
 typedef float kernel5x5_t[5][5];
+
+typedef struct {
+    uint8_t r, g, b, a;
+} nrgba_t;
 
 static void im_convolve(Image_t *dst, Image_t *const src);
 static uint32_t pix_get_nrgba(Image_t *img, Color_t *col, int x, int y);
@@ -65,11 +68,7 @@ void im_convolve(Image_t *dst, Image_t *const src)
 
 inline uint32_t pix_grayscale(uint32_t pix_dat)
 {
-    typedef struct {
-        uint8_t r, g, b, a;
-    } _nrgba_t;
-
-    _nrgba_t *pix = (_nrgba_t *)&pix_dat, dst;
+    nrgba_t *pix = (nrgba_t *)&pix_dat, dst;
     uint16_t r = pix->r;
     uint16_t g = pix->g;
     uint16_t b = pix->b;
@@ -107,14 +106,10 @@ inline uint32_t pix_get_nrgba(Image_t *img, Color_t *col, int x, int y)
 
 uint32_t convolve(Image_t *img, Color_t *col, kernel5x5_t kernel, int x, int y)
 {
-    typedef struct {
-        uint8_t r, g, b, a;
-    } _nrgba_t;
-
     int kx, ky;
     float mult;
     uint32_t pix_dat;
-    _nrgba_t *pix = (_nrgba_t *)&pix_dat, accum = {0, 0, 0, 0};
+    nrgba_t *pix = (nrgba_t *)&pix_dat, accum = {0, 0, 0, 0};
 
     pix_dat = pix_get_nrgba(img, col, x, y);
     accum.a = pix->a;
