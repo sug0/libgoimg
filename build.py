@@ -50,7 +50,7 @@ def sys(*args):
 def ppath(prefix, *args):
     return '%s%s%s' % (prefix, os.sep, os.sep.join(args))
 
-def raspberry_pi_opts():
+def arm_opts():
     try:
         with open('/proc/device-tree/model', 'r') as f:
             model = f.read()
@@ -60,6 +60,8 @@ def raspberry_pi_opts():
                 return '-mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
             elif model.find('Raspberry Pi ') != -1:
                 return '-mcpu=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp '
+            elif model.find('Xunlong Orange Pi PC') != -1:
+                return '-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
             else:
                 return ''
     except FileNotFoundError:
@@ -106,7 +108,7 @@ def optimized():
     either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, map(str.upper, args)))
 
     if either('aarch64', 'armv7l', 'armv6l'):
-        return raspberry_pi_opts()
+        return arm_opts()
     elif either('i686', 'i386', 'x86', 'x86_64', 'amd64'):
         return ' '.join(x86_opts()) + ' '
     else:
