@@ -117,7 +117,7 @@ def build(install=None):
     os.chdir('src')
 
     files = ['goio', 'allocator', 'color', 'image', 'util']
-    ccopt = '-std=c99 -pedantic -Wall -O3 ' + optimized() + build_fmt_opts(files)
+    ccopt = '-std=c99 -pedantic -fPIC -Wall -O3 ' + optimized() + build_fmt_opts(files)
     outlib = 'libgoimg.a'
 
     objs = [f+'.o' for f in files]
