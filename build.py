@@ -104,6 +104,9 @@ def x86_opts():
 # https://gist.github.com/fm4dd/c663217935dc17f0fc73c9c81b0aa845
 # https://en.wikipedia.org/wiki/Uname
 def optimized():
+    if os.getenv('UNOPTIMIZED'):
+        return ''
+
     m = machine().upper()
     either = lambda *args: reduce(lambda x,y: x or y, map(lambda x: m == x, map(str.upper, args)))
 
