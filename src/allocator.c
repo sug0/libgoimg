@@ -72,10 +72,11 @@ inline void *im_xrealloc(Allocator_t *allocator, void *ptr, size_t size)
 {
     /* fallback */
     if (unlikely(!allocator->realloc)) {
-        const size_t old_size = *(size_t *)((intptr_t *)ptr - sizeof(size_t));
+        void *const actual_ptr = (intptr_t *)ptr - sizeof(size_t);
+        const size_t old_size = *(size_t *)actual_ptr;
         void *new_ptr = im_xalloc(allocator, size);
         memcpy(new_ptr, ptr, old_size);
-        im_xfree(allocator, ptr);
+        im_xfree(allocator, actual_ptr);
         return new_ptr;
     }
 
