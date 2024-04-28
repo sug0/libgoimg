@@ -14,7 +14,7 @@
     #include <arpa/inet.h>
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
     #define unlikely(X)  __builtin_expect(!!(X), 0)
     #define likely(X)    __builtin_expect(!!(X), 1)
 #else
