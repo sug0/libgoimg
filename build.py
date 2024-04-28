@@ -25,6 +25,9 @@ def which(program):
 def find_cc():
     return os.getenv('CC') or which('cc') or which('gcc') or which('clang')
 
+def cflags():
+    return os.getenv('CFLAGS')
+
 def transform_fmt(fmt):
     return '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
 
@@ -55,15 +58,15 @@ def arm_opts():
         with open('/proc/device-tree/model', 'r') as f:
             model = f.read()
             if model.find('Raspberry Pi 3') != -1:
-                return '-mcpu=cortex-a53 -mtune=cortex-a53 '
+                return '-mcpu=cortex-a53 -mtune=cortex-a53'
             elif model.find('Raspberry Pi 2') != -1:
-                return '-mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
+                return '-mcpu=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4'
             elif model.find('Raspberry Pi ') != -1:
-                return '-mcpu=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp '
+                return '-mcpu=arm1176jzf-s -mfloat-abi=hard -mfpu=vfp'
             elif model.find('Xunlong Orange Pi PC') != -1:
-                return '-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4 '
+                return '-mcpu=cortex-a7 -mtune=cortex-a7 -mfloat-abi=hard -mfpu=neon-vfpv4'
             else:
-                return ''
+                return '-mcpu=native'
     except FileNotFoundError:
         return ''
 
@@ -113,16 +116,16 @@ def optimized():
     if either('aarch64', 'armv7l', 'armv6l'):
         return arm_opts()
     elif either('i686', 'i386', 'x86', 'x86_64', 'amd64'):
-        return ' '.join(x86_opts()) + ' '
+        return ' '.join(x86_opts())
     else:
-        return ''
+        return '-mcpu=native'
 
 def build(install=None):
     # change to source dir
     os.chdir('src')
 
     files = ['goio', 'allocator', 'color', 'image', 'util']
-    ccopt = '-std=c99 -pedantic -fPIC -Wall -O3 ' + optimized() + build_fmt_opts(files)
+    ccopt = f'-std=c99 -pedantic -fPIC -Wall -O3 {optimized()} {build_fmt_opts(files)} {cflags()}'
     outlib = 'libgoimg.a'
 
     objs = [f+'.o' for f in files]
