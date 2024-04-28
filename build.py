@@ -4,6 +4,7 @@ import os
 from sys import exit, argv
 from platform import machine
 from functools import reduce
+from pathlib import Path
 
 def is_exe(fpath):
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
@@ -26,7 +27,10 @@ def find_cc():
     return os.getenv('CC') or which('cc') or which('gcc') or which('clang')
 
 def cflags():
-    return os.getenv('CFLAGS')
+    try:
+        return Path(os.path.join('..', 'cflags.txt')).read_text().strip()
+    except FileNotFoundError:
+        return os.getenv('CFLAGS', '')
 
 def transform_fmt(fmt):
     return '-DGOIMG_COMPILE_FMT_%s' % fmt.upper()
